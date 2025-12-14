@@ -142,51 +142,144 @@
     1: {
       title: "Tahap 1",
       number: "01",
-      image: "assets/images/single-meeting.jpg",
+      image: "assets/images/meeting-01.jpg", 
       heading: "Studi Literatur & Persiapan",
-      desc: "Pengkajian indikator SDGs Desa dan standar pemetaan BIG/SNI untuk menjamin kesesuaian kaidah kartografi."
+      desc: `
+        <p style="text-align: justify; margin-bottom: 15px;">
+          Studi Literatur dan Persiapan merupakan fondasi strategis dan konseptual dalam pelaksanaan pemetaan potensi desa. Tahapan ini diawali dengan kajian komprehensif terhadap indikator <strong>Sustainable Development Goals (SDGs) Desa</strong> sebagai acuan utama pembangunan berkelanjutan. Fokus kajian diarahkan pada penyelarasan parameter pemetaan dengan target global, khususnya:
+        </p>
+        <ul style="margin-bottom: 15px; padding-left: 20px;">
+          <li><strong>SDG 2 & 6:</strong> Tanpa Kelaparan dan Air Bersih (Ketahanan Pangan & Air).</li>
+          <li><strong>SDG 8 & 11:</strong> Pekerjaan Layak dan Kota Berkelanjutan (Ekonomi Lokal & Pariwisata).</li>
+        </ul>
+        <p style="text-align: justify; margin-bottom: 15px;">
+          Secara teknis, tahap ini mencakup telaah mendalam terhadap regulasi <strong>Badan Informasi Geospasial (BIG)</strong> dan <strong>SNI</strong>. Tinjauan meliputi penerapan Sistem Referensi Geospasial Indonesia (SRGI 2013) dan proyeksi UTM guna menjamin akurasi geometrik, serta penyesuaian kaidah kartografi berdasarkan SNI 6502.2:2010. Selain itu, dilakukan perumusan indeks analisis seperti Indeks Ketahanan Pangan (IKP).
+        </p>
+        <p style="text-align: justify;">
+          Tahap ini juga mencakup penentuan kebutuhan data, penyusunan metode kerja, serta penyiapan perangkat lunak pendukung khususnya <strong>QGIS</strong>, agar proses akuisisi data berjalan sistematis untuk menghasilkan peta tematik yang akurat dan dapat dipertanggungjawabkan.
+        </p>`
     },
     2: {
       title: "Tahap 2",
       number: "02",
-      image: "assets/images/single-meeting.jpg",
+      image: "assets/images/meeting-02.jpg", 
       heading: "Pengumpulan Data Spasial & Sosial",
-      desc: "Data dikumpulkan melalui kombinasi data sekunder (BPS, OPD terkait, dan data statistik daerah). Pendekatan pemetaan partisipatif digunakan untuk menggali pengetahuan lokal terkait potensi ekonomi dan pariwisata desa."
+      desc: `
+        <p style="text-align: justify; margin-bottom: 15px;">
+          Pengumpulan Data Spasial dan Sosial merupakan tahapan krusial dalam membangun basis data yang komprehensif. Pengumpulan data dilakukan melalui kombinasi strategis antara data sekunder institusional dan data primer lapangan:
+        </p>
+        <ul style="margin-bottom: 15px; padding-left: 20px;">
+          <li><strong>Data Sekunder:</strong> Diperoleh dari BPS dan OPD terkait (Dinas Pertanian & PUPR), mencakup statistik demografi, kemiskinan, stunting, produksi pangan, hingga neraca air. Data spasial pendukung (jalan, batas admin) dihimpun dari portal geospasial nasional, OpenStreetMap, dan Google Maps.</li>
+          <li><strong>Data Primer (Participatory Mapping):</strong> Menggali <em>local knowledge</em> masyarakat melalui survei lapangan untuk memverifikasi sebaran UMKM, destinasi wisata, dan infrastruktur air yang belum terdokumentasi.</li>
+        </ul>
+        <p style="text-align: justify;">
+          Seluruh data <em>open source</em> divalidasi silang dengan citra satelit dan temuan lapangan untuk menjamin akurasi posisi dan validitas informasi. Hasil tahap ini menjadi fondasi penting agar keluaran pemetaan mencerminkan kondisi nyata serta perspektif lokal masyarakat desa.
+        </p>`
     },
     3: {
       title: "Tahap 3",
       number: "03",
-      image: "assets/images/single-meeting.jpg",
+      image: "assets/images/meeting-03.jpg",
       heading: "Pengolahan Data Menggunakan SIG",
-      desc: "Pengolahan data dilakukan di QGIS meliputi digitasi, standarisasi koordinat WGS84 dan overlay data spasial."
+      desc: `
+        <p style="text-align: justify; margin-bottom: 15px;">
+          Pengolahan Data Menggunakan Sistem Informasi Geografis (SIG) bertujuan mengintegrasikan data spasial dan nonspasial ke dalam sistem yang terstruktur menggunakan perangkat lunak <strong>QGIS</strong>. Proses ini terdiri dari tiga langkah utama:
+        </p>
+        <ol style="margin-bottom: 15px; padding-left: 20px;">
+          <li style="margin-bottom: 10px;">
+            <strong>Standardisasi & Digitasi:</strong> Penyeragaman sistem koordinat ke <em>WGS84 UTM Zona 49S</em> untuk presisi posisi. Dilanjutkan dengan digitasi unsur spasial dan pembersihan data (<em>data cleaning</em>) seperti perbaikan topologi (overlap, gap, dangling nodes).
+          </li>
+          <li style="margin-bottom: 10px;">
+            <strong>Integrasi Data:</strong> Melakukan <em>Attribute Join</em> untuk menghubungkan data statistik BPS (CSV) ke wilayah administrasi, serta <em>Spatial Join</em> untuk mengaitkan titik lokasi (UMKM/Wisata) dengan jaringan jalan.
+          </li>
+          <li>
+            <strong>Analisis Overlay:</strong> Tumpang susun antar-layer (misal: tutupan lahan vs produksi pertanian) untuk menghasilkan informasi tematik yang komprehensif.
+          </li>
+        </ol>
+        <p style="text-align: justify;">
+          Hasil pengolahan ini menyelaraskan data dari berbagai sumber menjadi satu basis data spasial yang konsisten, siap digunakan untuk penyusunan indeks dan pembuatan peta tematik yang valid secara teknis maupun kartografis.
+        </p>`
     },
     4: {
       title: "Tahap 4",
       number: "04",
-      image: "assets/images/single-meeting.jpg",
+      image: "assets/images/meeting-04.jpg",
       heading: "Penyusunan Indeks & Parameter",
-      desc: "Penyusunan indeks potensi ekonomi dan pariwisata meliputi UMKM, tenaga kerja, akses pasar, jenis wisata dan aksesibilitas."
+      desc: `
+        <p style="text-align: justify; margin-bottom: 15px;">
+          Tahap ini bertujuan merumuskan kerangka analisis kuantitatif untuk menerjemahkan data spasial dan nonspasial menjadi informasi strategis. Parameter utama disusun secara objektif meliputi:
+        </p>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #a12c2f;">
+          <p style="margin-bottom: 10px;">
+            <strong>1. Potensi Ekonomi</strong><br>
+            Fokus pada vitalitas usaha desa (UMKM, tenaga kerja, diversifikasi) dan analisis aksesibilitas (<em>Network Analysis</em>) untuk menilai jangkauan terhadap pasar dan logistik.
+          </p>
+          <p style="margin-bottom: 10px;">
+            <strong>2. Sektor Pariwisata</strong><br>
+            Menilai daya tarik berdasarkan jenis wisata, sebaran lokasi, dan persepsi pengunjung (rasio rating/review) untuk mengukur popularitas destinasi.
+          </p>
+          <p style="margin-bottom: 0;">
+            <strong>3. Ketahanan Pangan & Air</strong><br>
+            Mengacu pada Indeks Ketahanan Pangan (IKP) dan neraca air, mencakup ketersediaan pangan, aksesibilitas fisik/ekonomi, serta layanan irigasi.
+          </p>
+        </div>
+        <p style="text-align: justify; margin-top: 15px;">
+          Seluruh parameter melalui proses normalisasi dan reklasifikasi kelas potensi (rendah, sedang, tinggi) untuk divisualisasikan menjadi peta tematik yang mendukung kebijakan berbasis data.
+        </p>`
     },
     5: {
       title: "Tahap 5",
       number: "05",
-      image: "assets/images/single-meeting.jpg",
+      image: "assets/images/meeting-02.jpg",
       heading: "Analisis & Validasi Data",
-      desc: "Hasil analisis divalidasi melalui FGD bersama pemerintah desa dan kelompok masyarakat."
+      desc: `
+        <p class="mb-3">
+          Analisis dan Validasi Data merupakan tahapan verifikasi akhir yang bertujuan memastikan bahwa hasil pengolahan data dan penyusunan indeks potensi desa benar-benar mencerminkan kondisi nyata di lapangan serta layak digunakan sebagai dasar perencanaan pembangunan. Tahapan ini mengintegrasikan dua pendekatan utama, yaitu <strong>validasi teknis kartografis</strong> dan <strong>validasi sosial partisipatif</strong>.
+        </p>
+        <p class="mb-3">
+          Secara teknis, analisis dilakukan terhadap data spasial dan nonspasial di lingkungan QGIS. Evaluasi difokuskan pada pemeriksaan ketelitian geometrik dan konsistensi topologi untuk memastikan tidak terdapat kesalahan digitasi (<em>overlap, gap, dangling nodes</em>). Validasi atribut dilakukan dengan membandingkan informasi pada peta hasil olahan dengan temuan lapangan untuk menjamin kesesuaian representasi spasial.
+        </p>
+        <p>
+          Di sisi lain, validasi sosial dilaksanakan melalui <em>Focus Group Discussion</em> (FGD) yang melibatkan perangkat desa, tokoh masyarakat, dan kelompok tani. Forum ini berfungsi sebagai ruang konfirmasi terhadap hasil analisis spasial, sekaligus membangun konsensus mengenai prioritas pengembangan potensi desa. Hasil akhir inilah yang menjamin data kredibel, relevan, dan dapat diterima oleh masyarakat.
+        </p>`
     },
     6: {
       title: "Tahap 6",
       number: "06",
-      image: "assets/images/single-meeting.jpg",
+      image: "assets/images/meeting-03.jpg",
       heading: "Penyusunan Peta Tematik",
-      desc: "Pembuatan peta tematik meliputi peta potensi ekonomi, pariwisata, dan aksesibilitas wilayah."
+      desc: `
+        <p class="mb-3">
+          Penyusunan Peta Tematik merupakan puncak dari rangkaian analisis spasial, di mana data statistik dan geografis yang telah dianalisis dan divalidasi diterjemahkan ke dalam bentuk visual spasial yang informatif dan mudah dipahami. Pada tahap ini, hasil pengolahan dan penyusunan indeks potensi desa disajikan dalam berbagai peta tematik guna menggambarkan kondisi faktual, pola distribusi, serta disparitas potensi antarwilayah desa secara komprehensif.
+        </p>
+        <p class="mb-3">
+          Pada <strong>sektor ekonomi dan pariwisata</strong>, disusun sejumlah peta strategis, antara lain <strong>Peta Distribusi Aktivitas Ekonomi</strong> yang menggambarkan densitas dan sebaran UMKM, <strong>Peta Rasio Penduduk Bekerja</strong> untuk merepresentasikan tingkat partisipasi tenaga kerja lokal, serta <strong>Peta Aksesibilitas Pasar</strong> yang menunjukkan kemudahan jangkauan terhadap pusat-pusat kegiatan ekonomi. Visualisasi potensi pariwisata disajikan melalui <strong>Peta Jenis Wisata</strong> yang mengklasifikasikan destinasi berdasarkan karakteristiknya (wisata alam, budaya, dan buatan), <strong>Peta Jumlah Destinasi Wisata per Kecamatan</strong>, serta <strong>Peta Kualitas Destinasi</strong> yang menggunakan simbol proporsional berbasis rasio jumlah penilai dan nilai rating pengunjung guna menggambarkan tingkat popularitas dan daya tarik objek wisata.
+        </p>
+        <p class="mb-3">
+          Secara simultan, pada <strong>sektor ketahanan pangan dan air</strong>, penyusunan peta difokuskan pada indikator Indeks Ketahanan Pangan (IKP) serta pemetaan sebaran komoditas unggulan desa, seperti jagung, kedelai, dan ubi kayu. Pemetaan ketahanan air meliputi <strong>Peta Prioritas Layanan Irigasi Desa</strong> untuk mengidentifikasi kebutuhan dan sebaran infrastruktur pengairan, serta <strong>Peta Neraca Air</strong> yang menunjukkan kondisi surplus atau defisit air pada masing-masing wilayah. Peta-peta ini memberikan gambaran spasial yang terintegrasi antara aspek produksi, distribusi, dan ketersediaan sumber daya.
+        </p>
+        <p>
+          Seluruh peta tematik dirancang dengan menerapkan kaidah kartografi secara konsisten, meliputi pemilihan skala, klasifikasi data, simbol, dan tata letak peta. Variabel visual seperti teknik <em>choropleth</em> (gradasi warna) digunakan untuk menampilkan tingkatan intensitas atau indeks, sementara diagram lingkaran dan simbol proporsional digunakan untuk merepresentasikan proporsi dan besaran data. Pendekatan visual ini bertujuan agar informasi spasial dapat diinterpretasikan secara jelas dan efektif oleh berbagai pemangku kepentingan, sehingga peta yang dihasilkan tidak hanya berfungsi sebagai alat visualisasi, tetapi juga sebagai media pendukung perencanaan, pengambilan keputusan, dan penyusunan kebijakan pembangunan desa.
+        </p>`
     },
     7: {
       title: "Tahap 7",
       number: "07",
-      image: "assets/images/single-meeting.jpg",
+      image: "assets/images/meeting-01.jpg",
       heading: "Pengembangan WebGIS",
-      desc: "Integrasi hasil pemetaan ke dalam WebGIS untuk penyajian peta interaktif berbasis web."
+      desc: `
+        <p class="mb-3">
+          Pengembangan WebGIS merupakan tahap akhir yang berfungsi mengintegrasikan seluruh hasil pemetaan dan analisis potensi desa ke dalam sebuah platform peta digital berbasis web yang interaktif dan mudah diakses. Pada tahap ini, peta tematik yang telah disusun—meliputi peta potensi ekonomi, pariwisata, ketahanan pangan dan air, serta aksesibilitas wilayah—ditransformasikan dari bentuk peta statis menjadi WebGIS yang memungkinkan eksplorasi data spasial secara dinamis oleh berbagai pemangku kepentingan.
+        </p>
+        <p class="mb-3">
+          Pengembangan WebGIS dilakukan dengan memanfaatkan plugin <em>qgis2web</em> untuk mengonversi proyek lokal QGIS, termasuk struktur layer, simbologi, dan data atribut, ke dalam format web standar (HTML, CSS, dan JavaScript) yang didukung oleh pustaka pemetaan modern seperti <em>Leaflet</em> atau <em>OpenLayers</em>. Dalam proses ini, data vektor diekspor ke dalam format <strong>GeoJSON</strong>, sementara data raster disajikan dalam bentuk <em>tile</em> agar kompatibel dengan peramban web dan responsif terhadap interaksi pengguna. Sebagai media publikasi, digunakan layanan <strong>GitHub Pages</strong> yang memungkinkan penyajian WebGIS secara efisien, transparan, dan kolaboratif tanpa memerlukan konfigurasi server yang kompleks.
+        </p>
+        <p class="mb-3">
+          Selain aspek visualisasi, pengembangan WebGIS juga menekankan kualitas sistem dan pengalaman pengguna. <strong>Pengujian teknis</strong> dilakukan untuk memastikan konsistensi sistem proyeksi (CRS) serta akurasi geometri data setelah proses ekspor. Sementara itu, <strong>pengujian fungsionalitas</strong> difokuskan pada kinerja fitur interaktif, seperti navigasi peta (zoom dan pan), pengelolaan layer, pencarian lokasi, serta tampilan informasi atribut melalui popup. Evaluasi antarmuka pengguna (<em>user interface</em>) selanjutnya dilakukan menggunakan pendekatan usabilitas Nielsen yang mencakup lima komponen utama, yaitu <em>learnability, efficiency, memorability, errors,</em> dan <em>satisfaction</em>, guna memastikan WebGIS yang dihasilkan mudah digunakan, informatif, dan efektif.
+        </p>
+        <p>
+          Dengan tersedianya platform WebGIS ini, hasil pemetaan tidak hanya berhenti pada dokumen atau peta cetak, tetapi dapat dimanfaatkan secara berkelanjutan sebagai media informasi publik, sarana evaluasi, serta pendukung perencanaan dan pengambilan keputusan pembangunan desa berbasis data spasial oleh pemerintah daerah, pemerintah desa, maupun masyarakat luas.
+        </p>`
     }
   };
 
@@ -198,7 +291,7 @@
   document.getElementById("step-number").innerText = content.number;
   document.getElementById("step-image").src = content.image;
   document.getElementById("step-heading").innerText = content.heading;
-  document.getElementById("step-desc").innerText = content.desc;
+  document.getElementById("step-desc").innerHTML = content.desc;
 
   //according to loftblog tut
         $('.nav li:first').addClass('active');
