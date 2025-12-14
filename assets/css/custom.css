@@ -1,14 +1,89 @@
 .custom-card {
-    border-radius: 20px;
-    border: none;
+  border-radius: 20px;
+  border: none;
 }
 
 .custom-img {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 .card-link {
-    text-decoration: none;
-    color: inherit;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ========================= */
+/* MEETING CARD LAYOUT */
+/* ========================= */
+
+/* Samakan tinggi card */
+.meeting-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Samakan tinggi konten bawah */
+.meeting-item .down-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Batasi deskripsi & potong (...) */
+.meeting-item .down-content p {
+  flex-grow: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Grid rapi di semua layar */
+.templatemo-item-col {
+  display: flex;
+}
+
+/* ========================= */
+/* STEP + JUDUL */
+/* ========================= */
+
+/* Link judul */
+.step-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* Hover effect ringan */
+.step-link:hover h4 {
+  color: #a12c2f;
+}
+
+/* Step + Judul satu baris, segaris lurus */
+.step-title {
+  display: flex;
+  align-items: baseline;   /* KUNCI: sejajarkan teks */
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+/* Nomor langkah (dibesarkan & sejajar) */
+.step-number {
+  font-size: 20px;        /* BESARKAN NOMOR */
+  font-weight: 800;
+  color: #a12c2f;
+  border: 2px solid #a12c2f;
+  border-radius: 8px;
+  padding: 4px 10px;
+  line-height: 1;         /* cegah turun-naik */
+  white-space: nowrap;
+}
+
+/* Judul */
+.step-title h4 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
 }
