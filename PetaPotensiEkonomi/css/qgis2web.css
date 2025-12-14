@@ -759,4 +759,10 @@ body {
   font-size:13px;
   color:#444;
 }
+
+.header-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
 /*instruksi
