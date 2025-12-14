@@ -1,0 +1,762 @@
+/* ===== GLOBAL LAYOUT ===== */
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* MAP di kanan, mulai di bawah header */
+#map {
+    position: absolute;
+    top: 70px;          /* sejajar bawah header */
+    left: 260px;         /* lebar sidebar */
+    right: 0;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* ==== STYLE SIDEBAR ==== */
+#sidebar {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 260px;
+    bottom: 0;
+    background: #ffffffee;
+    padding: 10px 15px;
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.15);
+    font-family: "Inter", sans-serif;
+    z-index: 1000;
+}
+
+/* JUDUL DI DALAM SIDEBAR */
+#sidebar h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+/* NAMA-NAMA LAYER (checkbox) — ini WAAJIB !important */
+#sidebar label {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+}
+
+/* JUDUL DI DALAM KOTAK LEGENDA */
+.legend-title-inside {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+/* TEKS ITEM LEGENDA (angka-angka) */
+.legend-item span {
+    font-size: 13px !important;
+    color: #333 !important;
+}
+
+
+.col9 {
+    height: 100% !important;
+}
+
+.col3 {
+    height: 100%;
+    overflow: auto;
+}
+
+/* ===== INFO & POPUP ===== */
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background-color: #f8f8f8 !important;
+    color: #444444 !important;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.info h2 {
+    margin: 0 0 5px;
+}
+
+.leaflet-container {
+    background: #fff;
+    padding-right: 10px;
+}
+
+.leaflet-popup-scrolled {
+    border-bottom: unset !important;
+    border-top: unset !important;
+}
+
+.leaflet-popup-content {
+    max-height: 70vh;
+    max-width: 70vw;
+}
+
+.leaflet-popup-content.media {
+    width: auto !important;
+    height: auto !important;
+}
+
+.leaflet-popup-content th {
+    text-align: left;
+    vertical-align: top;
+    min-width: 75px;
+}
+
+.leaflet-popup-content td {
+    min-width: 75px;
+}
+
+.leaflet-popup-content td img {
+    max-height: 60vh;
+    max-width: 60vw;
+}
+
+/* TOOLTIP */
+.leaflet-tooltip {
+    background: none;
+    box-shadow: none;
+    border: none;
+}
+
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+    border: 0;
+}
+
+/* WARNA TEKS UMUM */
+.fa,
+.leaflet-container,
+a {
+    color: #444444 !important;
+}
+
+/* ===== KONTROL LEAFLET (ZOOM, LOCATE, SEARCH, MEASURE) ===== */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-locate a,
+.leaflet-touch .leaflet-control-geocoder-icon,
+.leaflet-control-search .search-button,
+.leaflet-control-measure {
+    background-color: #f8f8f8 !important;
+    border-radius: 0px !important;
+    color: #444444 !important;
+}
+
+/* POSISI STACK KONTROL DI KIRI ATAS (ZOOM, SEARCH, MEASURE, DLL.) */
+.leaflet-top.leaflet-left {
+    top: 5px !important;     /* sedikit turun dari atas */
+    left: 30px !important;   /* sedikit masuk dari kiri */
+}
+
+/* TOMBOL SEARCH DENGAN IKON */
+.leaflet-control-search .search-button {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 13px !important;
+    text-align: center !important;
+    cursor: pointer;
+
+    /* PENTING: path relatif dari css/qgis2web.css → ../images */
+    background-image: url('../images/search-icon.png') !important;
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* container search transparan */
+.leaflet-container .leaflet-control-search {
+    background: none !important;
+}
+
+/* tinggi input search */
+.leaflet-control-search .search-input {
+    margin: 0 !important;
+    height: 30px !important;
+}
+
+/* MEASURE CONTROL */
+.leaflet-control-measure .leaflet-control {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.leaflet-control-measure {
+    background: none !important;
+    border-radius: 4px !important;
+}
+
+.leaflet-control-measure .leaflet-control-measure-interaction {
+    background-color: #f8f8f8 !important;
+}
+
+.leaflet-touch .leaflet-control-measure .leaflet-control-measure-toggle,
+.leaflet-touch .leaflet-control-measure .leaflet-control-measure-toggle:hover {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 0px !important;
+    background-color: #f8f8f8 !important;
+    color: #444444 !important;
+    font-size: 13px;
+    line-height: 30px;
+    text-align: center;
+    text-indent: 0%;
+}
+
+/* ===== LAYERS CONTROL ===== */
+
+.leaflet-control-layers {
+    padding: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    background-color: #f8f8f8 !important;
+    color: #444444 !important;
+}
+
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar,
+.leaflet-control-search,
+.leaflet-control-measure {
+    border: 3px solid rgba(255, 255, 255, .4) !important;
+}
+
+.leaflet-control-layers-expanded {
+    padding-left: 6px;
+}
+
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+    display: block;
+    background-image: none;
+    text-decoration: none;
+    margin-bottom: 3px;
+}
+
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle::after {
+    content: '»';
+    font-size: x-large;
+    color: #444444 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+    display: none;
+}
+
+/* Z-INDEX */
+.leaflet-overlay-pane {
+    z-index: 550;
+}
+
+.leaflet-popup-pane {
+    z-index: 700;
+}
+
+#gcd-button-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== SCALE & ATTRIBUTION ===== */
+
+.leaflet-control-attribution a {
+    color: #0078A8 !important;
+}
+
+.leaflet-control-scale-line {
+    border: 2px solid #f8f8f8 !important;
+    border-top: none !important;
+    color: black !important;
+}
+
+/* ===== ABSTRACT BOX ===== */
+
+.abstract {
+    font: bold 18px 'Lucida Console', Monaco, monospace;
+    text-indent: 1px;
+    background-color: #f8f8f8 !important;
+    width: 30px !important;
+    color: #444444 !important;
+    height: 30px !important;
+    text-align: center !important;
+    line-height: 30px !important;
+}
+
+.abstractUncollapsed {
+    padding: 6px 8px;
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    background-color: #f8f8f8 !important;
+    color: #444444 !important;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    max-width: 40%;
+}
+
+/* ===== CUSTOM HEADER (JUDUL PETA) ===== */
+
+#custom-header {
+    width: 100%;
+    background: #e8f2fa; /* biru muda seperti contoh */
+    padding: 6px 16px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Inter", sans-serif;
+    border-bottom: 2px solid #cdd6df;
+
+    position: fixed;    /* nempel di atas */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    gap: 20px;
+}
+
+#header-logo {
+    height: 60px; /* sesuaikan dengan logo */
+}
+
+#custom-header h1 {
+    font-size: 22px;
+    margin: 0;
+    font-weight: 700;
+    color: #000000;
+}
+
+#custom-header h2 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: 500;
+    color: #000000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.header-right {
+    text-align: right;
+}
+
+.header-title {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ⚠️ TIDAK ADA padding-top di body lagi, supaya halaman tidak lebih tinggi dari viewport */
+body {
+    padding-top: 0 !important;
+}
+/* ===== HEADER SECTION STYLE (Layer & Legenda) ===== */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #e6e6e6;           /* abu-abu muda */
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 20px;
+    margin: 10px 0 10px 0;
+    border: 1px solid #d0d0d0;
+}
+
+.section-title img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+}
+#sidebar label,
+#sidebar p,
+#sidebar span,
+#sidebar div,
+#sidebar b {
+    font-family: "Inter", sans-serif !important;
+}
+/* === FONT FIX UNTUK SEMUA TEKS DI SIDEBAR === */
+
+#sidebar,
+#sidebar * {
+    font-family: "Inter", sans-serif !important;
+    font-size: 15px;
+}
+/* ====== LEGEND STYLE UNTUK POTENSI EKONOMI ====== */
+
+/* judul "Potensi Ekonomi Desa" */
+.legend-title-main {
+    display: block;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;      /* <<< gap kecil di bawah judul */
+}
+
+/* kotak container legend */
+.legend-box {
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 6px 8px;
+    background: #f8f8f8;
+}
+
+/* satu baris item legend */
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+/* hapus margin bawah untuk item terakhir */
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+
+/* kotak warna kecil */
+.legend-color {
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
+    border: 1px solid #555;
+}
+
+/* warna-warna mengikuti simbol di peta (kira-kira) */
+.legend-veryhigh {  /* hijau tua */
+    background: #1a9641;
+}
+
+.legend-high {      /* hijau muda */
+    background: #a6d96a;
+}
+
+.legend-medium {    /* krem */
+    background: #ffffc0;
+}
+
+.legend-low {       /* oranye */
+    background: #fdae61;
+}
+
+.legend-verylow {   /* merah */
+    background: #d73027;
+}
+/* judul legenda DI DALAM BOX */
+.legend-title-inside {
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 4px;
+}
+/* pop up informasi */
+.info-popup {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 260px;
+    background: white;
+    padding: 12px 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    font-size: 13px;
+    z-index: 9999;
+    display: none; /* default: sembunyi */
+}
+
+.info-popup h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    font-weight: bold;
+}
+/* === SAMAIN SEMUA FONT DALAM LEGENDA === */
+.legend-box,
+.legend-box * {
+    font-size: 14px !important;
+}
+
+/* ===== Legend Rasio Penduduk Bekerja (ukuran lingkaran) ===== */
+
+/* baris legend = ikon + teks sejajar */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* WADAH untuk lingkaran, kolom lebar tetap */
+.legend-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  width: 26px;   /* kolom fix, semua baris sama */
+  height: 26px;
+}
+
+/* LINGKARAN sebenernya (5 level) */
+.circle-bkrja-1,
+.circle-bkrja-2,
+.circle-bkrja-3,
+.circle-bkrja-4,
+.circle-bkrja-5 {
+  border-radius: 50%;
+  border: 1px solid #555;
+  background: #e4dcdc;
+  display: block;
+}
+
+/* ukuran beda-beda */
+.circle-bkrja-1 {  /* 73,49 - 73,94 */
+  width: 8px;
+  height: 8px;
+}
+.circle-bkrja-2 {  /* 73,94 - 74,30 */
+  width: 11px;
+  height: 11px;
+}
+.circle-bkrja-3 {  /* 74,30 - 74,47 */
+  width: 14px;
+  height: 14px;
+}
+.circle-bkrja-4 {  /* 74,47 - 74,73 */
+  width: 17px;
+  height: 17px;
+}
+.circle-bkrja-5 {  /* 74,73 - 99,18 */
+  width: 20px;
+  height: 20px;
+}
+/* ===== Legend Rasio UMKM (warna lingkaran) ===== */
+
+.umkm-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* wadah lingkaran */
+.umkm-legend-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+}
+
+/* lingkaran kecil warna UMKM */
+.umkm-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #444;
+  display: block;
+}
+
+/* kelas warna */
+.umkm-c1 { background: #f7fbff; }   /* 0 - 0.044 */
+.umkm-c2 { background: #c6dbef; }   /* 0.044 - 0.179 */
+.umkm-c3 { background: #6baed6; }   /* 0.179 - 0.305 */
+.umkm-c4 { background: #2171b5; }   /* 0.305 - 0.393 */
+.umkm-c5 { background: #08306b; }   /* 0.393 - 0.433 */
+
+.legend-pasar-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+}
+/* Style popup */
+.custom-popup .leaflet-popup-content {
+    margin: 8px 12px !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    width:95px;
+    color: #444;
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+    background: #ffffffee;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    border: 1px solid #ddd;
+}
+
+.custom-popup .leaflet-popup-tip {
+    background: #ffffffee;
+    border: 1px solid #ddd;
+}
+.info-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+    padding: 20px;
+    display: none; /* awalnya disembunyikan */
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#info-content {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #444;
+    line-height: 1.4em;
+}
+/* Header ala sidebar untuk panel info */
+.panel-info-header {
+    background:#e5e5e5;
+    padding:10px 14px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    font-family:'Inter', sans-serif;
+}
+
+.panel-info-title {
+    font-size:15px;
+    font-weight:600;
+    color:#000;
+}
+
+.panel-info-close {
+    background:none;
+    border:none;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    color:#333;
+    line-height:1;
+    padding:0;
+}
+.panel-info-close:hover {
+    color:#000;
+}
+/* KOTAK INFO DI PANEL KANAN */
+.info-card {
+  background:#ffffff;
+  border-radius:10px;
+  border:1px solid #ddd;
+  padding:10px 12px;
+  margin-bottom:10px;
+  font-family:'Inter', sans-serif;
+  font-size:13px;
+}
+
+.info-card-title {
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.info-row {
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:3px;
+}
+
+.info-row .label {
+  font-weight:500;
+  margin-right:4px;
+}
+
+.info-card hr {
+  border:0;
+  border-top:1px solid #e0e0e0;
+  margin:8px 0;
+}
+
+.info-card .info-desc {
+  margin:0;
+  font-size:13px;
+  line-height:1.4;
+  text-align:justify;
+  text-justify:inter-word;
+}
+.info-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  margin-bottom:6px;
+}
+
+.info-table td {
+  padding:2px 0;
+}
+
+.info-table .label {
+  width:150px;           /* supaya titik dua sejajar */
+  font-weight:500;
+}
+
+.info-table .colon {
+  width:10px;
+  font-weight:500;
+}
+
+.info-table .value {
+  text-align:left;
+  padding-left:4px;
+}
+.value .num {
+  display:inline-block;
+  margin-right:1px;
+}
+
+.value .unit {
+  display:inline-block;
+  white-space:nowrap;  /* BIKIN “jiwa” & “%” TETAP SEBARIS */
+  font-size:13px;
+  color:#444;
+}
+/* MEMAKSA angka + 'jiwa' tetap satu baris */
+.info-card .value {
+  white-space:nowrap !important;
+}
+
+.info-card .value .num {
+  display:inline-block !important;
+  margin-right:1px;
+  vertical-align:middle !important;
+}
+
+.info-card .value .unit {
+  display:inline-block !important;
+  vertical-align:middle !important;
+  white-space:nowrap !important;
+  font-size:13px;
+  color:#444;
+}
+/*instruksi
