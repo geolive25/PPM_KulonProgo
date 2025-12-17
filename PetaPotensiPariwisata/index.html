@@ -2834,12 +2834,34 @@ var layer_DesaWisata_9 = new L.geoJson(json_DesaWisata_9, {
       setTimeout(function() {
         
         if (layerParam === 'sebaran_wisata') {
-          // Aktifkan Jumlah Destinasi Wisata
-          const cb = document.getElementById('cb_jumlahwisata');
-          // Matikan layer eksklusif lain jika perlu (logic toggleExclusive sudah ada di script asli Anda)
-          if (cb && !cb.checked) {
-            cb.click(); 
+          const cbGroup = document.getElementById('cb_jeniswisata');
+          if (cbGroup && !cbGroup.checked) {
+            cbGroup.click();
           }
+
+          // 1. Aktifkan Jumlah Destinasi Wisata (choropleth)
+        const cbJumlah = document.getElementById('cb_jumlahwisata');
+        if (cbJumlah && !cbJumlah.checked) {
+          cbJumlah.click();
+        }
+
+          // Daftar semua layer jenis wisata
+          const wisataLayers = [
+            'cb_desawisata',
+            'cb_wisataalam',
+            'cb_wisatabahari',
+            'cb_wisatabuatan',
+            'cb_wisataminat',
+            'cb_wisatabudaya'
+          ];
+
+          wisataLayers.forEach(id => {
+            const cb = document.getElementById(id);
+            if (cb && !cb.checked) {
+              cb.click();
+            }
+          });
+
         } 
         else if (layerParam === 'akses_wisata') {
           // Aktifkan Aksesibilitas Wisata

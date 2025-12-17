@@ -1396,13 +1396,15 @@ Page Specific Styles (Headings, Meetings Page)
 */
 
 section.heading-page {
-  background-image: url(../images/heading-bg.jpg);
+  background-image: url(../images/Head_Kerangka.jpg);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   padding-top: 230px;
   padding-bottom: 110px;
   text-align: center;
+  background-color: rgba(0, 0, 0, 0.35);
+  background-blend-mode: darken;
 }
 
 section.heading-page h6 {

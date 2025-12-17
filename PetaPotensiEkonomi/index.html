@@ -1382,6 +1382,7 @@ cbPasar.addEventListener("change", function () {
 });
 </script>
 
+/// TAMBAHAN
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -1410,6 +1411,11 @@ cbPasar.addEventListener("change", function () {
           // Opsional: nyalakan jalan juga agar lebih informatif
           const cbJalan = document.getElementById('cb_jalan');
           if (cbJalan && !cbJalan.checked) cbJalan.click();
+        
+          const cbPasar = document.getElementById('cb_pasar');
+          if (cbPasar && !cbPasar.checked) {
+            cbPasar.click();
+          }
         }
         else if (layerParam === 'bekerja') {
            // Aktifkan Rasio Penduduk Bekerja
