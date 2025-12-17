@@ -2821,5 +2821,50 @@ var layer_DesaWisata_9 = new L.geoJson(json_DesaWisata_9, {
       bounds_group.addLayer(layer_Aksesibilitas_2);
       setBounds();
     </script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // 1. Ambil parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const layerParam = urlParams.get('layer');
+
+    // 2. Logika pemilihan layer
+    if (layerParam) {
+      setTimeout(function() {
+        
+        if (layerParam === 'sebaran_wisata') {
+          // Aktifkan Jumlah Destinasi Wisata
+          const cb = document.getElementById('cb_jumlahwisata');
+          // Matikan layer eksklusif lain jika perlu (logic toggleExclusive sudah ada di script asli Anda)
+          if (cb && !cb.checked) {
+            cb.click(); 
+          }
+        } 
+        else if (layerParam === 'akses_wisata') {
+          // Aktifkan Aksesibilitas Wisata
+          const cb = document.getElementById('cb_akses');
+          if (cb && !cb.checked) {
+            cb.click();
+          }
+          // Nyalakan jalan sebagai referensi
+          const cbJalan = document.getElementById('cb_jalan');
+          if (cbJalan && !cbJalan.checked) cbJalan.click();
+        }
+        else if (layerParam === 'jenis_wisata') {
+          // Aktifkan Group Jenis Wisata + Semua sub layer
+          const cbMain = document.getElementById('cb_jeniswisata');
+          if (cbMain && !cbMain.checked) cbMain.click();
+          
+          // Contoh: nyalakan salah satu sub-layer, misal Wisata Alam
+          const cbAlam = document.getElementById('cb_wisataalam');
+          if (cbAlam && !cbAlam.checked) cbAlam.click();
+        }
+
+      }, 500); // delay 500ms
+    }
+  });
+</script>
+
   </body>
 </html>

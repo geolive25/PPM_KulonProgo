@@ -1381,3 +1381,45 @@ cbPasar.addEventListener("change", function () {
   updateInstruksi();
 });
 </script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // 1. Ambil parameter dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const layerParam = urlParams.get('layer');
+
+    // 2. Logika pemilihan layer
+    if (layerParam) {
+      // Beri sedikit jeda agar peta siap sepenuhnya
+      setTimeout(function() {
+        
+        if (layerParam === 'umkm') {
+          // Aktifkan Checkbox UMKM
+          const cb = document.getElementById('cb_umkm');
+          if (cb && !cb.checked) {
+            cb.click(); // .click() akan memicu event listener 'change'
+          }
+        } 
+        else if (layerParam === 'akses_pasar') {
+          // Aktifkan Checkbox Aksesibilitas Pasar (kulprog)
+          const cb = document.getElementById('cb_kulprog');
+          if (cb && !cb.checked) {
+            cb.click();
+          }
+          // Opsional: nyalakan jalan juga agar lebih informatif
+          const cbJalan = document.getElementById('cb_jalan');
+          if (cbJalan && !cbJalan.checked) cbJalan.click();
+        }
+        else if (layerParam === 'bekerja') {
+           // Aktifkan Rasio Penduduk Bekerja
+           const cb = document.getElementById('cb_bekerja');
+           if (cb && !cb.checked) cb.click();
+        }
+
+      }, 500); // delay 500ms
+    }
+  });
+</script>
+</body>
+</html>
