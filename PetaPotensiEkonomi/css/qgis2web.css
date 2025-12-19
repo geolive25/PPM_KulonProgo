@@ -228,6 +228,9 @@ a {
     border: 3px solid rgba(255, 255, 255, .4) !important;
 }
 
+
+
+
 .leaflet-control-layers-expanded {
     padding-left: 6px;
 }
@@ -760,9 +763,18 @@ body {
   color:#444;
 }
 
-.header-link {
-  text-decoration: none;
-  color: inherit;
-  display: inline-block;
+
+/* ===== LEAFLET SEARCH CONTROL baruu===== */
+.leaflet-control-search {
+  background: #f8f8f8 !important;
 }
-/*instruksi
+
+/* ===== DISCLAIMER ===== */
+#map {
+  bottom: 32px; /* tinggi disclaimer */
+}
+#disclaimer {
+  background: #f8f8f8;
+  color: #555;
+  letter-spacing: 0.2px;
+}

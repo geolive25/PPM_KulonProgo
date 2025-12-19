@@ -18,6 +18,8 @@ body {
     background-color: #ffffff;
 }
 
+
+
 /* ==== STYLE SIDEBAR ==== */
 #sidebar {
     position: absolute;
@@ -271,11 +273,9 @@ a {
 }
 
 /* ===== SCALE & ATTRIBUTION ===== */
-
 .leaflet-control-attribution a {
     color: #0078A8 !important;
 }
-
 .leaflet-control-scale-line {
     border: 2px solid #f8f8f8 !important;
     border-top: none !important;
@@ -759,10 +759,19 @@ body {
   font-size:13px;
   color:#444;
 }
-
-.header-link {
-  text-decoration: none;
-  color: inherit;
-  display: inline-block;
-}
 /*instruksi
+
+
+
+/* ===== DISCLAIMER ===== */
+#map {
+  bottom: 32px; /* tinggi disclaimer */
+}
+#disclaimer {
+  background: #f8f8f8;
+  color: #555;
+  letter-spacing: 0.2px;
+}
+
+
+

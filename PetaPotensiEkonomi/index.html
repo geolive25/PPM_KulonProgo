@@ -34,7 +34,6 @@
   </head>
 
   <body>
-
  
  <!-- PANEL INSTRUKSI -->
 <div id="instruksi-layer" style="
@@ -102,6 +101,8 @@
   "></div>
 </div>
 
+
+
 <style>
   
  /* QGIS2WEB: layout map */
@@ -134,26 +135,22 @@ body.panel-open #instruksi-layer {
 }
 
 
+
+
 </style>
-
-
-
     <!-- HEADER CUSTOM (ALA DEVANTA) -->
     <div id="custom-header">
-      <a href="../index.html" class="header-link">
-        <div class="header-left">
-          <img src="images/transp.png" id="header-logo" alt="Logo">
-          <div class="header-title">
-            <h1>PETA POTENSI EKONOMI DESA KABUPATEN KULON PROGO</h1>
-          </div>
+      <div class="header-left">
+        <img src="images/transp.png" id="header-logo" alt="Logo">
+        <div class="header-title">
+          <h1>PETA POTENSI EKONOMI KABUPATEN KULON PROGO</h1>
         </div>
-      </a>
-
+      </div>
       <div class="header-right">
         <h2>Tahun 2025</h2>
       </div>
     </div>
-
+    
     <!-- SIDEBAR KIRI -->
     <div id="sidebar">
       <div class="section-title">
@@ -350,6 +347,8 @@ body.panel-open #instruksi-layer {
 
     <!-- KANVAS PETA -->
     <div id="map"></div>
+    
+
 
     <!-- JS LIBRARIES -->
     <script src="js/qgis2web_expressions.js"></script>
@@ -371,6 +370,31 @@ body.panel-open #instruksi-layer {
     <script src="data/titikkkRasio_UMKM_2.js"></script>
     <script src="data/jalanbnrjalann_3.js"></script>
     <script src="data/pasarunikpasarr_4.js"></script>
+
+
+    <div id="disclaimer">
+          Data yang digunakan bersumber dari BPS (Tahun 2024), OSM, dan data olahan penulis
+        </div>
+          <style>
+          #disclaimer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #e6f0f8;
+            border-top: 1px solid #dcdcdc;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-family: Inter, sans-serif;
+            color: #444;
+            text-align: center;
+            z-index: 1000;
+          }
+          </style>
+          <style>
+          /* === Naikkan attribution biar di atas disclaimer === */
+          .leaflet-control-attribution {bottom: 25px !important;  /* samain / sedikit di atas tinggi disclaimer */}
+          </style>
 
     <!-- SCRIPT PETA -->
     <script>
@@ -496,6 +520,8 @@ body.panel-open #instruksi-layer {
         secondaryAreaUnit: "hectares",
       });
       measureControl.addTo(map);
+
+
       document.getElementsByClassName("leaflet-control-measure-toggle")[0]
         .innerHTML = "";
       document.getElementsByClassName("leaflet-control-measure-toggle")[0]
@@ -505,12 +531,30 @@ body.panel-open #instruksi-layer {
       function setBounds() {}
 
       // BASEMAP
-      map.createPane("pane_OSMStandard_0");
-      map.getPane("pane_OSMStandard_0").style.zIndex = 400;
-      var layer_OSMStandard_0 = L.tileLayer(
+      // map.createPane("pane_OSMStandard_0");
+      // map.getPane("pane_OSMStandard_0").style.zIndex = 400;
+      // var layer_OSMStandard_0 = L.tileLayer(
+      //   "http://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      //   {
+      //     pane: "pane_OSMStandard_0",
+      //     opacity: 1.0,
+      //     attribution:
+      //       '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+      //     minZoom: 1,
+      //     maxZoom: 28,
+      //     minNativeZoom: 0,
+      //     maxNativeZoom: 19,
+      //   }
+      // );
+      // map.addLayer(layer_OSMStandard_0);
+      // ========== CREATE BASEMAP LAYERS ==========
+      // 1. OSM Standard
+      map.createPane("pane_OSMStandard");
+      map.getPane("pane_OSMStandard").style.zIndex = 400;
+      var layer_OSMStandard = L.tileLayer(
         "http://tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          pane: "pane_OSMStandard_0",
+          pane: "pane_OSMStandard",
           opacity: 1.0,
           attribution:
             '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
@@ -520,7 +564,79 @@ body.panel-open #instruksi-layer {
           maxNativeZoom: 19,
         }
       );
-      map.addLayer(layer_OSMStandard_0);
+      
+      // 2. Google Satellite
+      map.createPane("pane_GoogleSatellite");
+      map.getPane("pane_GoogleSatellite").style.zIndex = 401;
+      var layer_GoogleSatellite = L.tileLayer(
+        "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+        {
+          pane: "pane_GoogleSatellite",
+          opacity: 1.0,
+          attribution: '',
+          minZoom: 1,
+          maxZoom: 28,
+        }
+      );
+      
+      // 3. Google Satellite Hybrid
+      map.createPane("pane_GoogleSatelliteHybrid");
+      map.getPane("pane_GoogleSatelliteHybrid").style.zIndex = 402;
+      var layer_GoogleSatelliteHybrid = L.tileLayer(
+        "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+        {
+          pane: "pane_GoogleSatelliteHybrid",
+          opacity: 1.0,
+          attribution: '',
+          minZoom: 1,
+          maxZoom: 28,
+        }
+      );
+      
+      // 4. Esri Imagery
+      map.createPane("pane_EsriImagery");
+      map.getPane("pane_EsriImagery").style.zIndex = 403;
+      var layer_EsriImagery = L.tileLayer(
+        "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          pane: "pane_EsriImagery",
+          opacity: 1.0,
+          attribution: '',
+          minZoom: 1,
+          maxZoom: 28,
+        }
+      );
+      
+      // 5. Esri Dark Gray
+      map.createPane("pane_EsriDarkGray");
+      map.getPane("pane_EsriDarkGray").style.zIndex = 404;
+      var layer_EsriDarkGray = L.tileLayer(
+        "https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        {
+          pane: "pane_EsriDarkGray",
+          opacity: 1.0,
+          attribution: '',
+          minZoom: 1,
+          maxZoom: 28,
+        }
+      );
+      
+      // 6. Google Maps
+      map.createPane("pane_GoogleMaps");
+      map.getPane("pane_GoogleMaps").style.zIndex = 405;
+      var layer_GoogleMaps = L.tileLayer(
+        "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        {
+          pane: "pane_GoogleMaps",
+          opacity: 1.0,
+          attribution: '',
+          minZoom: 1,
+          maxZoom: 28,
+        }
+      );
+
+      // Tambahkan OSM Standard sebagai basemap default
+      map.addLayer(layer_OSMStandard);
       
 // PANEL INFORMASI
 function bukaPanel(html) {
@@ -733,7 +849,7 @@ btnInstruksiClose.addEventListener("click", function () {
       }
 
       map.createPane("pane_kulprogkeckeckp_1");
-      map.getPane("pane_kulprogkeckeckp_1").style.zIndex = 401;
+      map.getPane("pane_kulprogkeckeckp_1").style.zIndex = 406;
       map.getPane("pane_kulprogkeckeckp_1").style["mix-blend-mode"] =
         "normal";
 
@@ -748,7 +864,7 @@ btnInstruksiClose.addEventListener("click", function () {
       });
       layer_kulprogkeckeckp_1.on("click", function(e) {
 
-
+  
   var p = e.target.feature.properties;
 
   var html = `
@@ -771,6 +887,24 @@ btnInstruksiClose.addEventListener("click", function () {
 
   bukaPanel(html);
 });
+
+      // ====== CREATE LAYER CONTROL FOR BASEMAPS ======
+      // Buat layer control untuk pergantian basemap di pojok kanan bawah
+      var baseMaps = {
+        "OSM Standard": layer_OSMStandard,
+        "Google Satellite": layer_GoogleSatellite,
+        "Google Satellite Hybrid": layer_GoogleSatelliteHybrid,
+        "Esri Imagery": layer_EsriImagery,
+        "Esri Dark Gray": layer_EsriDarkGray,
+        "Google Maps": layer_GoogleMaps
+      };
+      
+      // Tambahkan layer control di pojok kanan bawah
+      var layerControl = L.control.layers(baseMaps, null, {
+        position: 'bottomright',
+        collapsed: true // Bisa dibuka/tutup
+      }).addTo(map);
+
 
 // Format angka ala Indonesia (1.234,56)
 function formatAngkaID(value, decimals = 0) {
@@ -1025,7 +1159,7 @@ function style_titikkkRasio_UMKM_2_0(feature) {
 
 
       map.createPane("pane_titikkkRasio_UMKM_2");
-      map.getPane("pane_titikkkRasio_UMKM_2").style.zIndex = 402;
+      map.getPane("pane_titikkkRasio_UMKM_2").style.zIndex = 407;
       map.getPane("pane_titikkkRasio_UMKM_2").style["mix-blend-mode"] =
         "normal";
 
@@ -1086,7 +1220,7 @@ function style_titikkkRasio_UMKM_2_0(feature) {
       }
 
       map.createPane("pane_jalanbnrjalann_3");
-      map.getPane("pane_jalanbnrjalann_3").style.zIndex = 403;
+      map.getPane("pane_jalanbnrjalann_3").style.zIndex = 408;
       map.getPane("pane_jalanbnrjalann_3").style["mix-blend-mode"] =
         "normal";
 
@@ -1161,7 +1295,7 @@ function style_titikkkRasio_UMKM_2_0(feature) {
       }
 
       map.createPane("pane_pasarunikpasarr_4");
-      map.getPane("pane_pasarunikpasarr_4").style.zIndex = 404;
+      map.getPane("pane_pasarunikpasarr_4").style.zIndex = 409;
       map.getPane("pane_pasarunikpasarr_4").style["mix-blend-mode"] =
         "normal";
 
@@ -1216,26 +1350,32 @@ var pasarIcon = L.icon({
       // lay.addTo(map); // kamu pakai sidebar sendiri, jadi ini dibiarkan off
 
       // Semua overlay dimatikan dulu (user nyalakan lewat checkbox)
-      map.removeLayer(layer_kulprogkeckeckp_1);
-      map.removeLayer(layer_titikkkRasio_UMKM_2);
-      map.removeLayer(layer_jalanbnrjalann_3);
-      map.removeLayer(layer_pasarunikpasarr_4);
+      // map.removeLayer(layer_kulprogkeckeckp_1);
+      // map.removeLayer(layer_titikkkRasio_UMKM_2);
+      // map.removeLayer(layer_jalanbnrjalann_3);
+      // map.removeLayer(layer_pasarunikpasarr_4);
+
+    
+      
+
 
       setBounds();
-
-      // SEARCH CONTROL (cari berdasarkan WADMKC di layer batas desa)
-      map.addControl(
-        new L.Control.Search({
-          layer: layer_kulprogkeckeckp_1,
-          initial: false,
-          hideMarkerOnCollapse: true,
-          propertyName: "WADMKC",
-        })
-      );
     </script>
 
     <!-- SCRIPT UNTUK SIDEBAR LAYER & LEGENDA -->
 <script>
+
+
+
+var searchControl = new L.Control.Search({
+    layer: layer_kulprogkeckeckp_1, // Pastikan layer ini sudah didefinisikan sebelumnya
+    initial: false,
+    hideMarkerOnCollapse: true,
+    propertyName: 'WADMKC', // Sesuaikan dengan kolom nama kecamatan di data Anda
+    position: 'topright'
+});
+
+map.addControl(searchControl);
 // ====== CONTROL SIDEBAR LAYER ======
 
 // Checkbox
@@ -1382,8 +1522,6 @@ cbPasar.addEventListener("change", function () {
 });
 </script>
 
-/// TAMBAHAN
-
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     // 1. Ambil parameter dari URL
@@ -1427,5 +1565,4 @@ cbPasar.addEventListener("change", function () {
     }
   });
 </script>
-</body>
-</html>
+

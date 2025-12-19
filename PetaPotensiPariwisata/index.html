@@ -172,14 +172,12 @@
 
     <!-- HEADER CUSTOM -->
     <div id="custom-header">
-      <a href="../index.html" class="header-link">
       <div class="header-left">
         <img src="images/transp.png" id="header-logo" alt="Logo">
         <div class="header-title">
           <h1>PETA POTENSI PARIWISATA KABUPATEN KULON PROGO</h1>
         </div>
       </div>
-      </a>
       <div class="header-right">
         <h2>Tahun 2025</h2>
       </div>
@@ -205,7 +203,7 @@
       gap:8px;
     ">
       <span id="instruksi-text">
-        Klik wilayah kecamatan atau destinasi wisata untuk melihat informasi.
+        Klik salah satu wilayah kecamatan atau titik di peta untuk melihat informasi.
       </span>
       <button id="instruksi-close" style="
         border:none;
@@ -659,26 +657,30 @@
     <!-- KANVAS PETA -->
     <div id="map"></div>
     
-    <!-- FOOTER INFORMASI SUMBER DATA -->
-    <div id="data-source-footer" style="
-      position: absolute;
-      bottom: 0;
-      left: 260px;
-      right: 0;
-      height: 25px;
-      background: rgba(255, 255, 255, 0.9);
-      border-top: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 11px;
-      color: #555;
-      transition: left 0.25s ease, right 0.25s ease;
-    ">
-      <span>Data yang digunakan dari Badan Pusat Statistik tahun 2024</span>
-    </div>
+    <!-- DISCLAIMER DI BAGIAN BAWAH -->
+    <div id="disclaimer">
+          Data yang digunakan bersumber dari BPS (Tahun 2024), OSM, GoogleMaps dan data olahan penulis
+        </div>
+          <style>
+          #disclaimer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #e6f0f8;
+            border-top: 1px solid #dcdcdc;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-family: Inter, sans-serif;
+            color: #444;
+            text-align: center;
+            z-index: 999;
+          }
+          </style>
+          <style>
+          /* === Naikkan attribution biar di atas disclaimer === */
+          .leaflet-control-attribution {bottom: 25px !important;  /* samain / sedikit di atas tinggi disclaimer */}
+          </style>
 
     <!-- JS LIBRARIES -->
     <script src="js/qgis2web_expressions.js"></script>
@@ -982,7 +984,7 @@
 
         box.style.display = "flex";
         text.textContent =
-          "Klik wilayah kecamatan untuk melihat informasi detail.";
+          "Klik salah satu wilayah kecamatan atau titik di peta untuk melihat informasi.";
       }
 
       // tombol X di panel instruksi
@@ -2820,73 +2822,73 @@ var layer_DesaWisata_9 = new L.geoJson(json_DesaWisata_9, {
       bounds_group.addLayer(layer_JumlahDestinasiWisata_1);
       bounds_group.addLayer(layer_Aksesibilitas_2);
       setBounds();
+
+      
     </script>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // 1. Ambil parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const layerParam = urlParams.get('layer');
 
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // 1. Ambil parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const layerParam = urlParams.get('layer');
+        // 2. Logika pemilihan layer
+        if (layerParam) {
+          setTimeout(function() {
+            
+            if (layerParam === 'sebaran_wisata') {
+              const cbGroup = document.getElementById('cb_jeniswisata');
+              if (cbGroup && !cbGroup.checked) {
+                cbGroup.click();
+              }
 
-    // 2. Logika pemilihan layer
-    if (layerParam) {
-      setTimeout(function() {
-        
-        if (layerParam === 'sebaran_wisata') {
-          const cbGroup = document.getElementById('cb_jeniswisata');
-          if (cbGroup && !cbGroup.checked) {
-            cbGroup.click();
-          }
-
-          // 1. Aktifkan Jumlah Destinasi Wisata (choropleth)
-        const cbJumlah = document.getElementById('cb_jumlahwisata');
-        if (cbJumlah && !cbJumlah.checked) {
-          cbJumlah.click();
-        }
-
-          // Daftar semua layer jenis wisata
-          const wisataLayers = [
-            'cb_desawisata',
-            'cb_wisataalam',
-            'cb_wisatabahari',
-            'cb_wisatabuatan',
-            'cb_wisataminat',
-            'cb_wisatabudaya'
-          ];
-
-          wisataLayers.forEach(id => {
-            const cb = document.getElementById(id);
-            if (cb && !cb.checked) {
-              cb.click();
+              // 1. Aktifkan Jumlah Destinasi Wisata (choropleth)
+            const cbJumlah = document.getElementById('cb_jumlahwisata');
+            if (cbJumlah && !cbJumlah.checked) {
+              cbJumlah.click();
             }
-          });
 
-        } 
-        else if (layerParam === 'akses_wisata') {
-          // Aktifkan Aksesibilitas Wisata
-          const cb = document.getElementById('cb_akses');
-          if (cb && !cb.checked) {
-            cb.click();
-          }
-          // Nyalakan jalan sebagai referensi
-          const cbJalan = document.getElementById('cb_jalan');
-          if (cbJalan && !cbJalan.checked) cbJalan.click();
+              // Daftar semua layer jenis wisata
+              const wisataLayers = [
+                'cb_desawisata',
+                'cb_wisataalam',
+                'cb_wisatabahari',
+                'cb_wisatabuatan',
+                'cb_wisataminat',
+                'cb_wisatabudaya'
+              ];
+
+              wisataLayers.forEach(id => {
+                const cb = document.getElementById(id);
+                if (cb && !cb.checked) {
+                  cb.click();
+                }
+              });
+
+            } 
+            else if (layerParam === 'akses_wisata') {
+              // Aktifkan Aksesibilitas Wisata
+              const cb = document.getElementById('cb_akses');
+              if (cb && !cb.checked) {
+                cb.click();
+              }
+              // Nyalakan jalan sebagai referensi
+              const cbJalan = document.getElementById('cb_jalan');
+              if (cbJalan && !cbJalan.checked) cbJalan.click();
+            }
+            else if (layerParam === 'jenis_wisata') {
+              // Aktifkan Group Jenis Wisata + Semua sub layer
+              const cbMain = document.getElementById('cb_jeniswisata');
+              if (cbMain && !cbMain.checked) cbMain.click();
+              
+              // Contoh: nyalakan salah satu sub-layer, misal Wisata Alam
+              const cbAlam = document.getElementById('cb_wisataalam');
+              if (cbAlam && !cbAlam.checked) cbAlam.click();
+            }
+
+          }, 500); // delay 500ms
         }
-        else if (layerParam === 'jenis_wisata') {
-          // Aktifkan Group Jenis Wisata + Semua sub layer
-          const cbMain = document.getElementById('cb_jeniswisata');
-          if (cbMain && !cbMain.checked) cbMain.click();
-          
-          // Contoh: nyalakan salah satu sub-layer, misal Wisata Alam
-          const cbAlam = document.getElementById('cb_wisataalam');
-          if (cbAlam && !cbAlam.checked) cbAlam.click();
-        }
-
-      }, 500); // delay 500ms
-    }
-  });
-</script>
-
+      });
+    </script>
   </body>
 </html>
