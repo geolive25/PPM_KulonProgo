@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+    <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+    <link rel="stylesheet" href="css/qgis2web.css">
+    <link rel="stylesheet" href="css/leaflet.photon.css">
+
+    <title>Peta Ketahanan Air - Kulon Progo</title>
+
+    <style>
+        :root {
+            --primary-color: #0077b6;
+            --secondary-color: #023e8a;
+            --accent-color: #48cae4;
+            --bg-light: #f8f9fa;
+            --text-dark: #2b2d42;
+            --sidebar-w: 360px;
+            --header-h: 70px;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --radius: 16px;
+        }
+
+        body, html { 
+            height: 100%; margin: 0; 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-light); color: var(--text-dark);
+            overflow: hidden;
+        }
+
+        #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
+
+        /* --- HEADER --- */
+        #appHeader {
+            position: absolute; top: 15px; left: 15px; right: 15px; height: var(--header-h);
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-radius: var(--radius); box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; z-index: 3000;
+        }
+        .appLeft { display: flex; align-items: center; gap: 16px; }
+        .appLogo { height: 45px; width: auto; object-fit: contain; }
+        .appTitle { font-weight: 700; font-size: 18px; color: var(--secondary-color); line-height: 1.2; }
+
+        /* --- HEADER RIGHT --- */
+        .appRight { 
+            display: flex; align-items: center; gap: 12px;
+            flex-grow: 1; justify-content: flex-end; max-width: 500px;
+            position: relative;
+        }
+
+        /* Search Box */
+        .header-search-wrapper { position: relative; flex-grow: 1; max-width: 250px; }
+        .leaflet-photon { width: 100% !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; background: transparent !important; }
+        .leaflet-photon-input {
+            width: 100% !important; height: 44px;
+            border-radius: 50px !important; border: 1px solid #e0e0e0 !important;
+            background-color: #f8f9fa !important;
+            padding-left: 45px !important; padding-right: 15px !important;
+            font-family: 'Poppins', sans-serif !important; font-size: 13px !important;
+            color: #444 !important; transition: all 0.3s ease; box-sizing: border-box;
+        }
+        .search-icon-overlay { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; font-size: 16px; pointer-events: none; z-index: 10; }
+        .leaflet-photon-input:focus {
+            background-color: #fff !important; border-color: var(--primary-color) !important;
+            box-shadow: 0 4px 15px rgba(0, 119, 182, 0.1) !important; outline: none;
+        }
+        .leaflet-photon-results {
+            border-radius: 12px !important; margin-top: 10px !important; border: none !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important; overflow: hidden;
+        }
+
+        /* Header Buttons */
+        .btn-header {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            background: #eef4f8; color: var(--primary-color);
+            font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; position: relative;
+        }
+        .btn-header:hover { background: var(--primary-color); color: white; box-shadow: 0 4px 10px rgba(0,119,182,0.2); }
+        .btn-header.active { background: var(--primary-color); color: white; }
+
+        /* Basemap Dropdown */
+        .basemap-dropdown {
+            position: absolute; top: 60px; right: 50px;
+            width: 220px; background: white; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); padding: 10px;
+            display: none; flex-direction: column; gap: 8px; z-index: 3001;
+            transform-origin: top right; animation: scaleIn 0.2s ease;
+        }
+        .basemap-dropdown.show { display: flex; }
+        .basemap-option {
+            display: flex; align-items: center; padding: 10px;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+        }
+        .basemap-option:hover { background-color: #f4f9fc; }
+        .basemap-option.active { background-color: #e3f2fd; border-color: var(--primary-color); }
+        .basemap-preview {
+            width: 40px; height: 40px; border-radius: 6px; margin-right: 12px;
+            background-size: cover; background-position: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .basemap-name { font-size: 13px; font-weight: 600; color: #444; }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* --- SIDEBAR --- */
+        #appSidebar {
+            position: fixed; top: 100px; left: 15px; bottom: 15px;
+            width: var(--sidebar-w);
+            background: #fff; border-radius: var(--radius);
+            box-shadow: var(--shadow); z-index: 4000;
+            display: flex; flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .sidebarHead {
+            padding: 20px; background: var(--primary-color); color: white;
+            display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+        }
+        .sidebarHeadTitle { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        
+        #layersMount { 
+            flex: 1; 
+            padding: 20px 20px 10px 20px; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start; 
+        }
+        
+        .sidebarFooter { padding: 15px; border-top: 1px solid #eee; background: #fafafa; flex-shrink: 0; }
+
+        #btnCollapse {
+            width: 100%; height: 45px; background: white; border: 1px solid #ddd;
+            color: var(--text-dark); border-radius: 10px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: all 0.2s;
+        }
+        #btnCollapse:hover { background: #f0f0f0; border-color: var(--primary-color); color: var(--primary-color); }
+
+        /* Sidebar Collapsed */
+        body.sidebar-collapsed #appSidebar { width: 60px; background: transparent !important; box-shadow: none !important; border: none; overflow: visible; pointer-events: none; }
+        body.sidebar-collapsed .sidebarHead { width: 50px; height: 50px; border-radius: 50%; padding: 0; margin: 0 auto; justify-content: center; box-shadow: var(--shadow); pointer-events: auto; }
+        body.sidebar-collapsed .sidebarHeadTitle span:last-child { display: none; }
+        body.sidebar-collapsed #layersMount { display: none !important; }
+        body.sidebar-collapsed .sidebarFooter { background: transparent; border: none; padding: 0; display: flex; justify-content: center; position: absolute; bottom: 0; left: 0; right: 0; pointer-events: auto; }
+        body.sidebar-collapsed #btnCollapse { width: 50px; height: 50px; border-radius: 50%; padding: 0; background: white; box-shadow: var(--shadow); border: none; }
+        body.sidebar-collapsed #btnCollapse .btnText { display: none; }
+        body.sidebar-collapsed #btnCollapse i { transform: rotate(180deg); }
+
+        /* ========================================= */
+        /* LAYER CONTROL (VERTICAL LEGEND BAR)       */
+        /* ========================================= */
+        
+        .leaflet-control-layers { width: 100%; background: transparent !important; border: none !important; padding: 0 !important; box-shadow: none !important; }
+        .leaflet-control-layers-list { height: auto !important; padding: 0 !important; }
+        .leaflet-control-layers-separator { display: none; }
+        .leaflet-control-layers-group-name { font-size: 12px; text-transform: uppercase; color: #888; font-weight: 700; margin: 5px 0 15px 5px; }
+
+        .leaflet-control-layers label {
+            background: #fff; border: 1px solid #eee; border-radius: 12px;
+            padding: 14px; margin-bottom: 14px; 
+            cursor: pointer; display: flex !important; align-items: flex-start; justify-content: space-between;
+            transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative;
+        }
+        .leaflet-control-layers label:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); border-color: #ccc; }
+        .leaflet-control-layers label.active-layer { background: #f0f9ff; border-color: var(--primary-color); border-left: 4px solid var(--primary-color); }
+
+        /* Toggle Switch */
+        .leaflet-control-layers input[type="checkbox"], .leaflet-control-layers input[type="radio"] {
+            appearance: none; width: 36px; height: 20px; background: #e0e0e0; border-radius: 20px;
+            position: relative; cursor: pointer; outline: none; transition: background 0.3s;
+            flex-shrink: 0; margin-left: 10px; margin-top: 2px; order: 2; 
+        }
+        .leaflet-control-layers input::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; 
+            background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.3s;
+        }
+        .leaflet-control-layers input:checked { background: var(--primary-color); }
+        .leaflet-control-layers input:checked::after { transform: translateX(16px); }
+
+        /* --- VISUAL LEGEND: VERTIKAL --- */
+        .leaflet-control-layers label span { flex: 1; order: 1; display: flex; flex-direction: column; width: 100%; }
+        .layer-title-text { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        
+        .legend-vertical-wrap {
+            display: flex;
+            flex-direction: row; 
+            align-items: stretch;
+            height: 60px;
+            gap: 12px;
+        }
+
+        .legend-bar-vertical {
+            width: 10px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .legend-bar-segment { flex: 1; width: 100%; }
+        .legend-text-list {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 500;
+            color: #666;
+            padding: 2px 0;
+        }
+        
+        .txt-high { font-weight: 600; }
+        .txt-mid { color: #888; }
+        .txt-low { font-weight: 600; }
+
+        /* --- INFO PANEL & MODAL --- */
+        .infoPanel {
+            position: fixed; top: 100px; right: 15px; bottom: 15px; width: 380px; background: white; border-radius: var(--radius);
+            box-shadow: var(--shadow); z-index: 2000; display: flex; flex-direction: column;
+            transform: translateX(120%); transition: transform 0.3s;
+        }
+        .infoPanel.open { transform: translateX(0); }
+        .infoHeader { padding: 16px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .infoTitle { font-weight: 700; font-size: 18px; color: var(--primary-color); }
+        .infoClose { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .infoBody { padding: 20px; overflow-y: auto; flex: 1; }
+        .infoTopName { font-size: 20px; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--accent-color); color: var(--secondary-color); }
+        .infoRow { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+        .infoSubTitle { margin-top: 25px; margin-bottom: 10px; font-size: 14px; font-weight: 700; text-transform: uppercase; color: #888; }
+        .infoNarrative { font-size: 13px; line-height: 1.6; color: #444; background: #f4f7f6; padding: 12px; border-radius: 8px; text-align: justify; }
+        
+        /* STYLE BARU UNTUK GAMBAR DI INFO PANEL */
+        .infoLayerImage {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block;
+            border: 1px solid #eee;
+        }
+
+        /* --- STYLE FOOTER TENGAH --- */
+        .map-footer {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            z-index: 3000;
+            pointer-events: none;
+            white-space: nowrap;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 5000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); animation: fadeIn 0.3s;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: white; width: 420px; max-width: 90%; padding: 30px; border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); position: relative; text-align: center;
+            transform: scale(0.95); transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal-card { transform: scale(1); }
+        .modal-icon { font-size: 48px; color: var(--primary-color); margin-bottom: 20px; opacity: 0.8; }
+        .modal-title { font-size: 22px; font-weight: 700; margin-bottom: 15px; color: var(--text-dark); }
+        .modal-text { font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 30px; }
+        .modal-btn { 
+            background: var(--primary-color); color: white; border: none; padding: 12px 30px; 
+            border-radius: 50px; font-weight: 600; cursor: pointer; font-size: 14px; transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0,119,182,0.3);
+        }
+        .modal-btn:hover { background: var(--secondary-color); transform: translateY(-2px); }
+        .modal-close-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; color: #bbb; font-size: 24px; transition: 0.2s; }
+        .modal-close-icon:hover { color: #333; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            #appHeader { left: 15px; right: 15px; flex-direction: column; height: auto; padding: 15px; gap: 15px; align-items: flex-start; }
+            .appRight { width: 100%; justify-content: space-between; max-width: none; }
+            .header-search-wrapper { max-width: none; flex: 1; }
+            #appSidebar { width: 260px; top: auto; bottom: 0; height: 50vh; left: 0; right: 0; border-radius: 20px 20px 0 0; }
+            body.sidebar-collapsed #appSidebar { width: 100%; height: 0; }
+            .infoPanel { width: 100%; top: auto; height: 50vh; left: 0; right: 0; bottom: 0; border-radius: 20px 20px 0 0; }
+            .basemap-dropdown { right: 15px; top: 120px; }
+            .map-footer { font-size: 10px; bottom: 15px; width: 90%; white-space: normal; text-align: center; }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="appHeader">
+        <div class="appLeft">
+            <img class="appLogo" src="images/Logo Horizontal Stack-Up.png" alt="Logo" />
+            <div class="appTitle">PETA KETAHANAN AIR<br>KABUPATEN KULON PROGO</div>
+        </div>
+        
+        <div class="appRight">
+            <div class="header-search-wrapper" id="headerSearchMount">
+                <i class="fas fa-search search-icon-overlay"></i>
+            </div>
+            
+            <button class="btn-header" id="btnBasemap" title="Ganti Peta Dasar">
+                <i class="fas fa-map"></i>
+            </button>
+            
+            <button class="btn-header" id="btnInfo" title="Tentang Data">
+                <i class="fas fa-info"></i>
+            </button>
+
+            <div class="basemap-dropdown" id="basemapDropdown">
+                <div class="basemap-option active" onclick="changeBasemap('esri_sat', this)">
+                    <div class="basemap-preview" style="background-image: url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/0/0/0');"></div>
+                    <span class="basemap-name">Esri Satellite</span>
+                </div>
+                <div class="basemap-option" onclick="changeBasemap('osm', this)">
+                    <div class="basemap-preview" style="background-image: url('https://a.tile.openstreetmap.org/0/0/0.png');"></div>
+                    <span class="basemap-name">OpenStreetMap</span>
+                </div>
+                <div class="basemap-option" onclick="changeBasemap('esri_street', this)">
+                    <div class="basemap-preview" style="background-image: url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/0/0/0');"></div>
+                    <span class="basemap-name">Esri World Street</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <aside id="appSidebar">
+        <div class="sidebarHead">
+            <div class="sidebarHeadTitle"><i class="fas fa-layer-group"></i><span>Layer Kontrol</span></div>
+        </div>
+        <div id="layersMount"></div>
+        <div class="sidebarFooter">
+            <button id="btnCollapse" type="button"><i class="fas fa-chevron-left"></i><span class="btnText">Sembunyikan Menu</span></button>
+        </div>
+    </aside>
+
+    <aside id="infoPanel" class="infoPanel">
+        <div class="infoHeader"><div class="infoTitle">Informasi Detail</div><button id="infoClose" class="infoClose">&times;</button></div>
+        <div id="infoBody" class="infoBody">
+            <div style="text-align: center; color: #888; margin-top: 50px;">
+                <i class="fas fa-mouse-pointer" style="font-size: 30px; margin-bottom: 10px;"></i>
+                <br>Klik objek pada peta untuk<br>melihat informasi detail.
+            </div>
+        </div>
+    </aside>
+
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal-card">
+            <i class="fas fa-times modal-close-icon" id="modalCloseX"></i>
+            <div class="modal-icon"><i class="fas fa-database"></i></div>
+            <div class="modal-title">Sumber Data Terintegrasi</div>
+            <div class="modal-text">Peta ini disusun melalui <b>integrasi data lintas waktu (multiyear)</b> yang mencakup sejumlah periode tahun berbeda. Pendekatan ini dipilih sebagai solusi atas keterbatasan ketersediaan data dalam satu periode tahun yang seragam. Dengan menggabungkan data dari berbagai rentang waktu, diharapkan hasil pemetaan dapat memberikan gambaran yang lebih komprehensif, konsisten, serta tetap relevan untuk mendukung analisis dan pengambilan keputusan.</div>
+            <button class="modal-btn" id="modalCloseBtn">Saya Mengerti</button>
+        </div>
+    </div>
+    
+    <div class="map-footer">
+        &copy; 2025 PRGG Teknik Geodesi - Universitas Gadjah Mada
+    </div>
+
+    <div id="map"></div>
+
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Layers.Tree.min.js"></script>
+    <script src="js/L.Control.Locate.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet.photon.js"></script>
+
+    <script src="data/PetaNeracaAir_0.js"></script>
+    <script src="data/PetaPrioritasIrigasi_1.js"></script>
+    <script src="data/PetaCurahHujandanHariHujanRataRata_2.js"></script>
+    <script src="data/JaringanSungai_3.js"></script>
+
+    <script>
+        var map = L.map('map', { zoomControl: false, maxZoom: 28, minZoom: 1 });
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('Leaflet | QGIS2Web');
+        
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}, position: 'bottomright'}).addTo(map);
+
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() { if (bounds_group.getLayers().length) map.fitBounds(bounds_group.getBounds()); }
+        function forceLeafletRedraw(){ map.invalidateSize(true); }
+
+        // --- BASEMAPS ---
+        var basemapLayers = {
+            "esri_sat": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 28 }),
+            "osm": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 28 }),
+            "esri_street": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 28 })
+        };
+        map.addLayer(basemapLayers["esri_sat"]);
+
+        // --- WARNA ---
+        var colorNeraca = { low: '#f7fcf5', mid: '#7bc77c', high: '#00441b' };
+        var colorPrio = { low: '#1a9641', mid: '#fec981', high: '#d7191c' };
+        var colorHujan = { low: '#f7fbff', mid: '#73b2d8', high: '#08306b' };
+
+        // --- LAYER STYLES ---
+        function style_PetaNeracaAir_0_0(feature) {
+            var val = feature.properties['Neraca Air'];
+            var c = colorNeraca.low;
+            if (val > 0 && val <= 1889498978) c = colorNeraca.mid; else if (val > 1889498978) c = colorNeraca.high;
+            return { pane: 'pane_PetaNeracaAir_0', opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: c, interactive: true }
+        }
+        map.createPane('pane_PetaNeracaAir_0'); map.getPane('pane_PetaNeracaAir_0').style.zIndex = 401;
+        var layer_PetaNeracaAir_0 = new L.geoJson(json_PetaNeracaAir_0, { dataVar: 'json_PetaNeracaAir_0', layerName: 'PetaNeracaAir', pane: 'pane_PetaNeracaAir_0', style: style_PetaNeracaAir_0_0 });
+        bounds_group.addLayer(layer_PetaNeracaAir_0); map.addLayer(layer_PetaNeracaAir_0);
+
+        function style_PetaPrioritasIrigasi_1_0(feature) {
+            var val = String(feature.properties['Prioritas']);
+            var c = '#fff';
+            if (val === 'Rendah') c = colorPrio.low; else if (val === 'Sedang') c = colorPrio.mid; else if (val === 'Tinggi') c = colorPrio.high;
+            return { pane: 'pane_PetaPrioritasIrigasi_1', opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: c, interactive: true }
+        }
+        map.createPane('pane_PetaPrioritasIrigasi_1'); map.getPane('pane_PetaPrioritasIrigasi_1').style.zIndex = 402;
+        var layer_PetaPrioritasIrigasi_1 = new L.geoJson(json_PetaPrioritasIrigasi_1, { dataVar: 'json_PetaPrioritasIrigasi_1', layerName: 'PetaPrioritasIrigasi', pane: 'pane_PetaPrioritasIrigasi_1', style: style_PetaPrioritasIrigasi_1_0 });
+        bounds_group.addLayer(layer_PetaPrioritasIrigasi_1);
+
+        function style_PetaCurahHujandanHariHujanRataRata_2_0(feature) {
+            var val = feature.properties[' Tahunan'];
+            var c = colorHujan.low;
+            if (val > 246 && val <= 1500) c = colorHujan.mid; else if (val > 1500) c = colorHujan.high;
+            return { pane: 'pane_PetaCurahHujandanHariHujanRataRata_2', opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: c, interactive: true }
+        }
+        map.createPane('pane_PetaCurahHujandanHariHujanRataRata_2'); map.getPane('pane_PetaCurahHujandanHariHujanRataRata_2').style.zIndex = 403;
+        var layer_PetaCurahHujandanHariHujanRataRata_2 = new L.geoJson(json_PetaCurahHujandanHariHujanRataRata_2, { dataVar: 'json_PetaCurahHujandanHariHujanRataRata_2', layerName: 'PetaCurahHujan', pane: 'pane_PetaCurahHujandanHariHujanRataRata_2', style: style_PetaCurahHujandanHariHujanRataRata_2_0 });
+        bounds_group.addLayer(layer_PetaCurahHujandanHariHujanRataRata_2);
+
+        function style_JaringanSungai_3_0() { return { pane: 'pane_JaringanSungai_3', opacity: 1, color: '#48cae4', weight: 1.5, interactive: false } }
+        map.createPane('pane_JaringanSungai_3'); map.getPane('pane_JaringanSungai_3').style.zIndex = 404;
+        var layer_JaringanSungai_3 = new L.geoJson(json_JaringanSungai_3, { layerName: 'JaringanSungai', pane: 'pane_JaringanSungai_3', style: style_JaringanSungai_3_0 });
+        bounds_group.addLayer(layer_JaringanSungai_3); map.addLayer(layer_JaringanSungai_3);
+
+        // --- SEARCH & UI ---
+        var photonControl = L.control.photon({ url: "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&", placeholder: 'Cari Lokasi...' });
+        photonControl.addTo(map);
+        var searchContainer = photonControl.getContainer();
+        var headerMount = document.getElementById("headerSearchMount");
+        if(searchContainer && headerMount) { headerMount.appendChild(searchContainer); }
+
+        var modal = document.getElementById('aboutModal'), btnInfo = document.getElementById('btnInfo'), 
+            btnClose = document.getElementById('modalCloseBtn'), iconClose = document.getElementById('modalCloseX'),
+            btnBasemap = document.getElementById('btnBasemap'), dropdown = document.getElementById('basemapDropdown');
+
+        function toggleModal(show) { modal.classList.toggle('active', show); }
+        btnInfo.addEventListener('click', () => toggleModal(true));
+        btnClose.addEventListener('click', () => toggleModal(false));
+        iconClose.addEventListener('click', () => toggleModal(false));
+        modal.addEventListener('click', (e) => { if(e.target === modal) toggleModal(false); });
+
+        btnBasemap.addEventListener('click', function(e) {
+            e.stopPropagation(); dropdown.classList.toggle('show'); btnBasemap.classList.toggle('active');
+        });
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && !btnBasemap.contains(e.target)) { dropdown.classList.remove('show'); btnBasemap.classList.remove('active'); }
+        });
+
+        window.changeBasemap = function(type, element) {
+            for (var key in basemapLayers) { if (map.hasLayer(basemapLayers[key])) map.removeLayer(basemapLayers[key]); }
+            map.addLayer(basemapLayers[type]);
+            var options = document.querySelectorAll('.basemap-option'); options.forEach(opt => opt.classList.remove('active')); element.classList.add('active');
+            setTimeout(() => { dropdown.classList.remove('show'); btnBasemap.classList.remove('active'); }, 100);
+        };
+
+        // --- HTML LEGENDA VERTIKAL (Bar Kiri, Teks Kanan) ---
+        var labelNeraca = `
+            <div class="layer-title-text">Neraca Air</div>
+            <div class="legend-vertical-wrap">
+                <div class="legend-bar-vertical">
+                    <div class="legend-bar-segment" style="background:${colorNeraca.high}"></div>
+                    <div class="legend-bar-segment" style="background:${colorNeraca.mid}"></div>
+                    <div class="legend-bar-segment" style="background:${colorNeraca.low}"></div>
+                </div>
+                <div class="legend-text-list">
+                    <span class="txt-high">Surplus</span>
+                    <span class="txt-mid">Seimbang</span>
+                    <span class="txt-low">Defisit</span>
+                </div>
+            </div>`;
+
+        var labelPrioritas = `
+            <div class="layer-title-text">Prioritas Irigasi</div>
+            <div class="legend-vertical-wrap">
+                <div class="legend-bar-vertical">
+                    <div class="legend-bar-segment" style="background:${colorPrio.high}"></div>
+                    <div class="legend-bar-segment" style="background:${colorPrio.mid}"></div>
+                    <div class="legend-bar-segment" style="background:${colorPrio.low}"></div>
+                </div>
+                <div class="legend-text-list">
+                    <span class="txt-high" style="color:#d7191c">Tinggi</span>
+                    <span class="txt-mid">Sedang</span>
+                    <span class="txt-low" style="color:#1a9641">Rendah</span>
+                </div>
+            </div>`;
+
+        var labelHujan = `
+            <div class="layer-title-text">Curah Hujan</div>
+            <div class="legend-vertical-wrap">
+                <div class="legend-bar-vertical">
+                    <div class="legend-bar-segment" style="background:${colorHujan.high}"></div>
+                    <div class="legend-bar-segment" style="background:${colorHujan.mid}"></div>
+                    <div class="legend-bar-segment" style="background:${colorHujan.low}"></div>
+                </div>
+                <div class="legend-text-list">
+                    <span class="txt-high">Tinggi</span>
+                    <span class="txt-mid">Sedang</span>
+                    <span class="txt-low">Rendah</span>
+                </div>
+            </div>`;
+
+        var overlaysTree = [
+            { label: '<div style="font-size:14px; font-weight:600; color:#0077b6; padding:8px 0;"><i class="fas fa-water"></i> Jaringan Sungai</div>', layer: layer_JaringanSungai_3 },
+            { 
+                label: '<b>Analisis Ketahanan Air</b>', selectAllCheckbox: false, 
+                children: [
+                    { label: labelNeraca, layer: layer_PetaNeracaAir_0 },
+                    { label: labelPrioritas, layer: layer_PetaPrioritasIrigasi_1 },
+                    { label: labelHujan, layer: layer_PetaCurahHujandanHariHujanRataRata_2 },
+                ]
+            }
+        ];
+
+        var lay = L.control.layers.tree(null, overlaysTree, { collapsed: false });
+        lay.addTo(map); setBounds();
+
+        var exclusiveLayers = [layer_PetaNeracaAir_0, layer_PetaPrioritasIrigasi_1, layer_PetaCurahHujandanHariHujanRataRata_2];
+        function updateActiveState() {
+            document.querySelectorAll('.leaflet-control-layers label').forEach(lbl => lbl.classList.remove('active-layer'));
+            map.eachLayer(function(layer){
+                if(exclusiveLayers.includes(layer)){
+                    document.querySelectorAll('.leaflet-control-layers input').forEach(inp => { if(inp.checked) inp.closest('label').classList.add('active-layer'); });
+                }
+            });
+        }
+        map.on('overlayadd', function(e) {
+            if (exclusiveLayers.includes(e.layer)) { exclusiveLayers.forEach(function(l) { if (l !== e.layer && map.hasLayer(l)) map.removeLayer(l); }); }
+            updateActiveState();
+        });
+        map.on('overlayremove', updateActiveState);
+
+        var ctrlLayer = document.querySelector(".leaflet-control-layers");
+        var mountPoint = document.getElementById("layersMount");
+        if (ctrlLayer && mountPoint) { mountPoint.appendChild(ctrlLayer); }
+
+        document.getElementById("btnCollapse").addEventListener("click", function(){
+            document.body.classList.toggle("sidebar-collapsed");
+            var icon = this.querySelector("i");
+            if(document.body.classList.contains("sidebar-collapsed")) icon.className = "fas fa-chevron-right"; else icon.className = "fas fa-chevron-left";
+            setTimeout(forceLeafletRedraw, 300);
+        });
+
+        // ===============================================
+        //  LOGIKA INFORMASI, KESIMPULAN & GAMBAR DINAMIS
+        // ===============================================
+
+        var infoPanel = document.getElementById("infoPanel"), infoBody = document.getElementById("infoBody");
+        document.getElementById("infoClose").addEventListener("click", () => infoPanel.classList.remove("open"));
+        function renderRow(label, value){ return `<div class="infoRow"><div class="infoLabel">${label}</div><div class="infoValue">${value || '-'}</div></div>`; }
+
+        // --- KONFIGURASI GAMBAR PER LAYER ---
+        // PERBAIKAN: Menggunakan garis miring (/) agar tidak error di JavaScript
+        var layerImages = {
+            "PetaNeracaAir": "images/neraca.jpeg", 
+            "PetaPrioritasIrigasi": "images/PRIORITAS.png", 
+            "PetaCurahHujan": "images/CURAH.png"
+        };
+
+        function getNarrative(layerName, p) {
+            if (layerName === 'PetaNeracaAir') {
+                var val = p['Neraca Air'];
+                if (val > 1889498978) {
+                    return "Status: <b style='color:#00441b'>Surplus</b><br>Ketersediaan air di kecamatan ini melebihi kebutuhan (Surplus). Wilayah ini memiliki potensi cadangan air yang baik untuk mendukung pengembangan pertanian dan kebutuhan domestik masa depan.";
+                } else if (val > 0) {
+                    return "Status: <b style='color:#7bc77c'>Seimbang</b><br>Kondisi neraca air di kecamatan ini tergolong Seimbang. Ketersediaan air mampu mencukupi kebutuhan saat ini, namun efisiensi penggunaan air tetap diperlukan untuk mencegah defisit.";
+                } else {
+                    return "Status: <b style='color:#d7191c'>Defisit</b><br>Kecamatan ini mengalami Defisit neraca air. Kebutuhan air melampaui ketersediaan yang ada. Diperlukan langkah konservasi air, perbaikan tata kelola air, atau suplesi dari wilayah lain.";
+                }
+
+            } else if (layerName === 'PetaPrioritasIrigasi') {
+                var val = p['Prioritas'];
+                if (val === 'Tinggi') {
+                    return "Status: <b style='color:#d7191c'>Prioritas Tinggi</b><br>Wilayah ini sangat mendesak untuk mendapatkan penanganan irigasi. Terdapat kesenjangan signifikan antara kebutuhan air irigasi dengan infrastruktur atau pasokan yang tersedia.";
+                } else if (val === 'Sedang') {
+                    return "Status: <b style='color:#fec981'>Prioritas Sedang</b><br>Wilayah ini memerlukan pemeliharaan rutin dan peningkatan efisiensi jaringan irigasi untuk menjaga produktivitas lahan pertanian tetap optimal.";
+                } else {
+                    return "Status: <b style='color:#1a9641'>Prioritas Rendah</b><br>Kondisi irigasi di wilayah ini relatif aman dan memadai. Fokus utama adalah pada operasional dan pemeliharaan infrastruktur yang sudah ada.";
+                }
+
+            } else if (layerName === 'PetaCurahHujan') {
+                var val = p[' Tahunan'] !== undefined ? p[' Tahunan'] : 0; 
+                if (val > 1500) {
+                    return "Status: <b style='color:#08306b'>Curah Hujan Tinggi</b><br>Wilayah dengan curah hujan tinggi memiliki potensi sumber daya air melimpah. Dapat dimanfaatkan untuk pertanian tadah hujan maupun pengisian air tanah.";
+                } else if (val > 246) {
+                    return "Status: <b style='color:#73b2d8'>Curah Hujan Sedang</b><br>Wilayah ini memiliki intensitas hujan yang cukup. Pengelolaan jadwal tanam yang tepat sangat penting untuk memanfaatkan musim hujan secara maksimal.";
+                } else {
+                    return "Status: <b style='color:#777'>Curah Hujan Rendah</b><br>Wilayah ini memiliki curah hujan rendah dan rentan kekeringan. Sangat bergantung pada irigasi teknis dan memerlukan varietas tanaman yang hemat air.";
+                }
+            }
+            return "";
+        }
+
+        function attachClickEvent(layer, config) {
+            layer.eachLayer(function(l) {
+                l.on("click", function(e) {
+                    var p = e.target.feature.properties;
+                    var title = p.WADMKC || p.Kecamatan || "Wilayah";
+                    
+                    var html = `<div class="infoTopName">${title}</div>`;
+                    
+                    // Render Data Tabel
+                    config.fields.forEach(f => { html += renderRow(f.label, p[f.key]); });
+                    
+                    // Render Kesimpulan Dinamis
+                    var narrativeText = getNarrative(config.name, p);
+                    if (narrativeText) {
+                        html += `<div class="infoSubTitle">Analisis Wilayah</div><div class="infoNarrative">${narrativeText}</div>`;
+                    }
+
+                    // Render Gambar (Baru)
+                    var imgPath = layerImages[config.name];
+                    if (imgPath) {
+                        html += `<img src="${imgPath}" alt="Ilustrasi ${config.name}" class="infoLayerImage">`;
+                    }
+                    
+                    infoBody.innerHTML = html;
+                    infoPanel.classList.add("open");
+                });
+            });
+        }
+        
+        attachClickEvent(layer_PetaNeracaAir_0, { name: "PetaNeracaAir", fields: [{label: "Kecamatan", key: "WADMKC"}, {label: "Neraca Air", key: "Neraca Air"}] });
+        attachClickEvent(layer_PetaPrioritasIrigasi_1, { name: "PetaPrioritasIrigasi", fields: [{label: "Kecamatan", key: "WADMKC"}, {label: "Prioritas", key: "Prioritas"}] });
+        attachClickEvent(layer_PetaCurahHujandanHariHujanRataRata_2, { name: "PetaCurahHujan", fields: [{label: "Kecamatan", key: "WADMKC"}, {label: "Vol Hujan", key: "Vol Hujan"}] });
+
+        var i = 0;
+        layer_PetaNeracaAir_0.eachLayer(function(layer) {
+            layer.bindTooltip((layer.feature.properties['WADMKC'] !== null?String('<div style="color: #000; font-size: 10pt; font-family: \'Poppins\', sans-serif; text-shadow: 1px 1px 0 #fff;">' + layer.feature.properties['WADMKC']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_PetaNeracaAir_0'});
+            labels.push(layer); totalMarkers += 1; layer.added = true; addLabel(layer, i); i++;
+        });
+        resetLabels([layer_PetaNeracaAir_0]);
+        map.on("zoomend", () => resetLabels([layer_PetaNeracaAir_0]));
+        map.on("layeradd", () => resetLabels([layer_PetaNeracaAir_0]));
+        map.on("layerremove", () => resetLabels([layer_PetaNeracaAir_0]));
+        setTimeout(updateActiveState, 1000);
+    </script>
+    <script>
+        // ============================================================
+        // LOGIKA URL PARAMETER (Agar Layer Menyala Sesuai Link Galeri)
+        // ============================================================
+
+        function activateLayerFromUrl() {
+            // 1. Ambil parameter dari URL (contoh: ?layer=irigasi)
+            var urlParams = new URLSearchParams(window.location.search);
+            var activeParam = urlParams.get('layer');
+
+            // Jika tidak ada parameter, biarkan default (Neraca Air biasanya default)
+            if (!activeParam) return;
+
+            // 2. Definisi Layer yang tersedia
+            // ... (kode Anda yang sudah benar di sini) ...
+
+            // 3. Matikan semua layer eksklusif
+            if (map.hasLayer(layer_PetaNeracaAir_0)) map.removeLayer(layer_PetaNeracaAir_0);
+            if (map.hasLayer(layer_PetaPrioritasIrigasi_1)) map.removeLayer(layer_PetaPrioritasIrigasi_1);
+            if (map.hasLayer(layer_PetaCurahHujandanHariHujanRataRata_2)) map.removeLayer(layer_PetaCurahHujandanHariHujanRataRata_2);
+
+            // 4. Nyalakan layer sesuai parameter
+            if (activeParam === 'neraca') {
+                map.addLayer(layer_PetaNeracaAir_0);
+                updateActiveState(); 
+            } 
+            else if (activeParam === 'irigasi') {
+                map.addLayer(layer_PetaPrioritasIrigasi_1);
+                updateActiveState();
+            } 
+            else if (activeParam === 'hujan') {
+                map.addLayer(layer_PetaCurahHujandanHariHujanRataRata_2);
+                updateActiveState();
+            }
+        }
+        
+        // --- TAMBAHKAN BARIS INI AGAR FUNGSI DIJALANKAN ---
+        activateLayerFromUrl(); 
+
+    </script>
+    
+</body>
+</html>

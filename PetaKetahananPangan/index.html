@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/leaflet.css" />
+  <link rel="stylesheet" href="css/qgis2web.css" />
+  <link rel="stylesheet" href="css/leaflet.photon.css" />
+
+  <title>PETA KETAHANAN DAN KERENTANAN PANGAN KABUPATEN KULON PROGO</title>
+
+  <style>
+    :root {
+      --primary: #1e293b;
+      --ugm-blue: #004a8b; 
+      --ugm-dark: #002b52;
+      --accent: #0077c2;   
+      --bg-glass: #ffffff;
+      --sidebar-w: 320px;
+    }
+
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #334155;
+      overflow: hidden;
+    }
+
+    #map {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%; z-index: 1;
+    }
+
+    /* --- HEADER --- */
+    #appHeader {
+      position: fixed;
+      top: 20px; left: 20px; right: 20px;
+      height: 72px; 
+      background: #ffffff;
+      border-radius: 16px; 
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px 0 20px;
+      z-index: 3000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0;
+    }
+
+    .appLeft { 
+        display: flex; 
+        align-items: center; 
+        gap: 0; 
+        height: 100%;
+    }
+
+    .appLogo { 
+        width: 128px; 
+        height: 128px; 
+        object-fit: contain; 
+    }
+
+    .header-divider {
+        height: 42px;          
+        width: 2px;            
+        background-color: #cbd5e1; 
+        margin: 0 32px 0 16px;        
+        border-radius: 2px;
+    }
+
+    .ugm-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-right: 16px; 
+        padding-right: 16px;
+        border-right: 2px solid #e2e8f0; 
+        display: none; 
+    }
+    @media (min-width: 1000px) {
+        .ugm-text { display: flex; }
+    }
+    
+    .ugm-line {
+        font-family: serif; 
+        color: var(--ugm-blue);
+        font-size: 13px;
+        line-height: 1.1;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .title-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .title-top { 
+      font-weight: 700; 
+      font-size: 14px; 
+      color: var(--ugm-blue); 
+      letter-spacing: 0.02em; 
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    
+    .title-bottom {
+      font-weight: 800;
+      font-size: 19px; 
+      color: var(--ugm-dark);
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .appRight { display: flex; align-items: center; gap: 12px; }
+
+    .search-wrapper { position: relative; }
+    .search-input {
+        height: 40px; width: 200px;
+        border: 1px solid #94a3b8; border-radius: 6px;
+        padding: 0 12px; font-size: 13px; color: #334155;
+        background: #fff; transition: all 0.2s;
+    }
+    .search-input:focus {
+        outline: none; border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(0, 119, 194, 0.1); width: 240px;
+    }
+
+    .header-btn {
+        width: 42px; height: 42px;
+        border-radius: 8px; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; transition: all 0.2s;
+    }
+    .btn-basemap { background-color: var(--accent); color: white; }
+    .btn-basemap:hover { background-color: var(--ugm-dark); }
+    .btn-info { background-color: #f1f5f9; color: var(--ugm-blue); }
+    .btn-info:hover { background-color: #e2e8f0; }
+
+    #basemapModal {
+        position: fixed; top: 100px; right: 80px; width: 200px;
+        background: white; border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 8px;
+        z-index: 3100; display: none; border: 1px solid #e2e8f0;
+        animation: slideDown 0.2s ease-out;
+    }
+    .bm-option {
+        padding: 10px 12px; border-radius: 8px; cursor: pointer;
+        font-size: 13px; font-weight: 500; color: #334155;
+        display: flex; align-items: center; gap: 10px; transition: background 0.1s;
+    }
+    .bm-option:hover { background: #f1f5f9; }
+    .bm-option.active { background: #eff6ff; color: var(--accent); font-weight: 600; }
+
+    #aboutModal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4); z-index: 4000; display: none;
+        align-items: center; justify-content: center; backdrop-filter: blur(4px);
+    }
+    .about-card {
+        background: white; width: 500px; max-width: 90%;
+        border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden;
+        animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .about-header { background: var(--accent); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .about-title { font-weight: 700; font-size: 18px; }
+    .about-close { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    .about-body { padding: 24px; font-size: 14px; line-height: 1.6; color: #475569; }
+
+    #customSidebar {
+      position: fixed; top: 110px; left: 20px; bottom: 30px;
+      width: var(--sidebar-w); background: #ffffff; z-index: 2500;
+      display: flex; flex-direction: column; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); border: none;
+    }
+    body.sb-hidden #customSidebar { transform: translateX(calc(-100% - 40px)); }
+
+    #btnReopen {
+      position: fixed; top: 110px; left: 20px; width: 52px; height: 52px;
+      background-color: var(--accent); color: white; border-radius: 50%;
+      z-index: 2000; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; box-shadow: 0 8px 20px rgba(0,119,194,0.3);
+      cursor: pointer; border: 2px solid white;
+      transition: all 0.4s; transform: scale(0); opacity: 0;
+    }
+    body.sb-hidden #btnReopen { transform: scale(1); opacity: 1; }
+
+    .sb-header { background: var(--accent); color: white; padding: 16px 20px; font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .sb-content { flex: 1; overflow-y: auto; padding: 16px; background: #ffffff; }
+    .sb-footer { padding: 16px 20px; background: white; border-top: 1px solid #f1f5f9; }
+
+    .group-label { font-size: 12px; font-weight: 600; color: #64748b; margin: 16px 0 8px 0; }
+    
+    .layer-card { 
+        background: white; border: 1px solid #e2e8f0; border-radius: 10px; 
+        padding: 12px 14px; margin-bottom: 10px; position: relative; transition: all 0.2s;
+    }
+    .layer-card.active { border-color: var(--accent); background: #f0f9ff; box-shadow: 0 2px 8px rgba(0, 119, 194, 0.08); }
+    .card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .l-title { font-size: 14px; font-weight: 600; color: #334155; }
+    .l-desc { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+    .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    .card-legend { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); display: none; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 12px; color: #475569; font-weight: 500; }
+    .color-box { width: 8px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+    
+    .btn-hide-menu { width: 100%; padding: 10px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; color: #475569; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .btn-hide-menu:hover { background: #f8fafc; }
+
+    /* Info Panel */
+    .infoPanel {
+      position: fixed; top: 110px; right: 20px; bottom: 30px; width: 340px;
+      background: rgba(255,255,255,0.98); border-radius: 12px; z-index: 2800; display: flex; flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.4s; border: 1px solid #e2e8f0;
+    }
+    .infoPanel.active { transform: translateX(0); }
+    .infoHeader { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f1f5f9; }
+    .infoTitle { font-size: 15px; font-weight: 700; color: var(--primary); }
+    .infoClose { border: none; background: #f1f5f9; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display:flex; align-items:center; justify-content:center;}
+    .infoBody { padding: 20px; overflow-y: auto; flex: 1; }
+    .infoTable { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .infoTable td { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #334155; }
+    
+    /* Analysis Box Style */
+    .analysis-box {
+        background: #f0f9ff;
+        border-left: 4px solid var(--accent);
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        font-size: 13px;
+        color: #334155;
+        line-height: 1.5;
+    }
+
+    /* --- COPYRIGHT BAR (TAMBAHAN) --- */
+    .copyright-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px 40px;
+      border-radius: 50px;
+      z-index: 3500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border: 1px solid #e2e8f0;
+      font-size: 15px;
+      color: #334155;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    @keyframes slideDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+    @keyframes zoomIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+    
+    @media (max-width: 768px) {
+        #appHeader { height: 60px; padding: 0 12px; }
+        .appLogo { width: 36px; height: 36px; }
+        .header-divider { height: 32px; margin: 0 10px; }
+        .ugm-text { display: none; }
+        .title-top { font-size: 11px; }
+        .title-bottom { font-size: 14px; }
+        .search-input { width: 120px; }
+        .search-input:focus { width: 150px; }
+        #customSidebar { top: 90px; width: 280px; }
+        #btnReopen { top: 90px; }
+        .copyright-bar { font-size: 11px; padding: 8px 20px; bottom: 10px; width: 85%; text-align: center; } /* */
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="copyright-bar">
+    © 2025 PRGG Teknik Geodesi – Universitas Gadjah Mada
+  </div>
+
+  <header id="appHeader">
+    <div class="appLeft">
+      <img class="appLogo" src="images/Logo Horizontal Stack-Up.png" alt="Logo UGM" onerror="this.style.display='none'"/>
+      <div class="header-divider"></div>
+      
+      <div class="title-container">
+          <div class="title-top">PETA KETAHANAN DAN KERENTANAN PANGAN</div>
+          <div class="title-bottom">KABUPATEN KULON PROGO</div>
+      </div>
+    </div>
+    
+    <div class="appRight">
+        <div class="search-wrapper">
+            <input type="text" class="search-input" id="searchBox" placeholder="Cari Lokasi...">
+        </div>
+        <button class="header-btn btn-basemap" id="btnBasemapToggle" title="Ganti Peta Dasar">
+            <i class="fas fa-map"></i>
+        </button>
+        <button class="header-btn btn-info" id="btnAboutToggle" title="Tentang Peta">
+            <i class="fas fa-info"></i>
+        </button>
+    </div>
+  </header>
+
+  <div id="basemapModal">
+      <div class="bm-option active" onclick="switchBasemap('sat')" id="opt-sat">
+        <i class="fas fa-satellite"></i> Esri Satelit
+      </div>
+      <div class="bm-option" onclick="switchBasemap('street')" id="opt-street">
+        <i class="fas fa-road"></i> Esri Street
+      </div>
+      <div class="bm-option" onclick="switchBasemap('osm')" id="opt-osm">
+        <i class="fas fa-globe-asia"></i> OpenStreetMap
+      </div>
+  </div>
+
+  <div id="aboutModal">
+      <div class="about-card">
+          <div class="about-header">
+              <div class="about-title">Tentang Peta</div>
+              <button class="about-close" id="btnAboutClose">&times;</button>
+          </div>
+          <div class="about-body">
+              <p><strong>Peta ini disusun melalui <b>integrasi data lintas waktu (multiyear)</b> yang mencakup sejumlah periode tahun berbeda. Pendekatan ini dipilih sebagai solusi atas keterbatasan ketersediaan data dalam satu periode tahun yang seragam. Dengan menggabungkan data dari berbagai rentang waktu, diharapkan hasil pemetaan dapat memberikan gambaran yang lebih komprehensif, konsisten, serta tetap relevan untuk mendukung analisis dan pengambilan keputusan.</p>
+              <p style="margin-top:20px; font-size:12px; color:#94a3b8;">
+                  Sumber Data: Pemerintah Kabupaten Kulon Progo, Badan Pusat Statistik (BPS), dan Dinas Terkait .<br>
+                  Base Map by Esri & OpenStreetMap.
+              </p>
+          </div>
+      </div>
+  </div>
+
+  <div id="btnReopen" title="Buka Layer Kontrol">
+    <i class="fas fa-layer-group"></i>
+  </div>
+
+  <aside id="customSidebar">
+    <div class="sb-header">
+        <i class="fas fa-layer-group"></i> Layer Kontrol
+    </div>
+    <div class="sb-content" id="layerContainer"></div>
+    <div class="sb-footer">
+        <button class="btn-hide-menu" id="btnHide">
+            <i class="fas fa-chevron-left"></i> Sembunyikan Menu
+        </button>
+    </div>
+  </aside>
+
+  <aside id="infoPanel" class="infoPanel">
+    <div class="infoHeader">
+      <div class="infoTitle">Detail Informasi</div>
+      <button id="infoClose" class="infoClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="infoBody" class="infoBody">
+      <div style="text-align:center; color:#94a3b8; margin-top:50px;">
+        Klik objek peta untuk info detail.
+      </div>
+    </div>
+  </aside>
+
+  <div id="map"></div>
+
+  <script src="js/qgis2web_expressions.js"></script>
+  <script src="js/leaflet.js"></script>
+  <script src="js/multi-style-layer.js"></script>
+  <script src="js/leaflet.rotatedMarker.js"></script>
+  <script src="js/leaflet.pattern.js"></script>
+  <script src="js/leaflet-hash.js"></script>
+  <script src="js/Autolinker.min.js"></script>
+  <script src="js/rbush.min.js"></script>
+  <script src="js/labelgun.min.js"></script>
+  <script src="js/labels.js"></script>
+  <script src="js/leaflet.photon.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+
+  <script src="data/RasioLuasPerkebunan_1.js"></script>
+  <script src="data/IndeksKetahananKerentanan_2.js"></script>
+  <script src="data/Angkaharapanhiduppadasaatlahir_3.js"></script>
+  <script src="data/PrevelanceBalitaStunting_4.js"></script>
+  <script src="data/Rasiojumlahpendudukpertenagakesehatanterhadaptingkatkepadatanpenduduk_5.js"></script>
+  <script src="data/Persentaserumahtanggatanpaakseskeairbersih_6.js"></script>
+  <script src="data/Rataratalamasekolahperempuandiatas15tahun_7.js"></script>
+  <script src="data/Persentaserumahtanggatanpaakseslistrik_8.js"></script>
+  <script src="data/Persentaserumahtanggadenganproporsipengeluaranuntukpanganlebihdari65terhadaptotalpengeluaran_9.js"></script>
+  <script src="data/PersentasependudukdibawahGarisKemiskinan_10.js"></script>
+  <script src="data/Rasiokosumsinormatifterhadapketeresediaanbersihperkapitaperhari_11.js"></script>
+  <script src="data/JalanLain_12.js"></script>
+  <script src="data/JalanLokal_13.js"></script>
+  <script src="data/JalanKolektor_14.js"></script>
+  <script src="data/BatasKecamatan_17.js"></script>
+  <script src="data/PetaKeterjangkauanDistribusi_0.js"></script>
+  <script src="data/jalan_arteri_lokal_1.js"></script>
+  <script src="data/SHORTESTPATH_3.js"></script>
+  <script src="data/pasar_5.js"></script>
+  <script src="data/produksi_0.js"></script>
+
+  <script>
+    // 1. INIT MAP
+    var map = L.map('map', { zoomControl:false, maxZoom:28, minZoom:1 })
+      .fitBounds([[-8.243686768154406,108.82457678841777],[-7.346921326174121,110.9854950978433]]);
+    
+    var hash = new L.Hash(map);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    var basemaps = {
+        'sat': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri', maxZoom: 20 }),
+        'street': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri', maxZoom: 20 }),
+        'osm': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM', maxZoom: 19 })
+    };
+    var currentBasemap = basemaps['sat'];
+    currentBasemap.addTo(map);
+
+    function switchBasemap(type) {
+        map.removeLayer(currentBasemap);
+        currentBasemap = basemaps[type];
+        map.addLayer(currentBasemap);
+        currentBasemap.bringToBack();
+        document.querySelectorAll('.bm-option').forEach(el => el.classList.remove('active'));
+        document.getElementById('opt-'+type).classList.add('active');
+        document.getElementById('basemapModal').style.display = 'none';
+    }
+
+    // Search
+    document.getElementById('searchBox').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const query = this.value;
+            if(query.length > 2) {
+                fetch(`https://photon.komoot.io/api/?q=${query}&limit=1&lat=-7.8&lon=110.1`)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.features.length > 0) {
+                        const coords = data.features[0].geometry.coordinates;
+                        map.flyTo([coords[1], coords[0]], 16);
+                    } else { alert("Lokasi tidak ditemukan"); }
+                });
+            }
+        }
+    });
+
+    // 2. CONFIG DATA LAYERS
+    function styleByPrioritas(paneName, strokeColor, fillColors){
+      return function(feature){
+        var pr = String(feature.properties['Prioritas']);
+        var fc = fillColors[pr] || 'rgba(0,0,0,0)';
+        return { pane:paneName, opacity:1, color: strokeColor, weight:1, fill:true, fillOpacity:1, fillColor: fc, interactive:true };
+      }
+    }
+
+    map.createPane('pane_IKP'); map.getPane('pane_IKP').style.zIndex = 402;
+    var layer_IKP = new L.geoJson(json_IndeksKetahananKerentanan_2, {
+      pane:'pane_IKP',
+      style: styleByPrioritas('pane_IKP','rgba(255,255,255,0.5)',{ '1':'#d73027','2':'#fc8d59','3':'#fee08b','4':'#d9ef8b','5':'#1a9850' })
+    });
+    map.addLayer(layer_IKP);
+
+    map.createPane('pane_Akses'); map.getPane('pane_Akses').style.zIndex = 401;
+    var layer_Akses = new L.geoJson(json_PetaKeterjangkauanDistribusi_0, {
+      pane: 'pane_Akses', interactive: true,
+      style: function(f) {
+        var v = f.properties['jarak_m_mi'];
+        if (v <= 2353) return {pane:'pane_Akses', color:null, weight:0, fillOpacity:0.8, fillColor:'#1a9641'};
+        if (v <= 2900) return {pane:'pane_Akses', color:null, weight:0, fillOpacity:0.8, fillColor:'#a6d96a'};
+        if (v <= 4197) return {pane:'pane_Akses', color:null, weight:0, fillOpacity:0.8, fillColor:'#ffffc0'};
+        if (v <= 6220) return {pane:'pane_Akses', color:null, weight:0, fillOpacity:0.8, fillColor:'#fdae61'};
+        return {pane:'pane_Akses', color:null, weight:0, fillOpacity:0.8, fillColor:'#d7191c'};
+      }
+    });
+
+    map.createPane('pane_Jalan'); map.getPane('pane_Jalan').style.zIndex = 502;
+    var layer_Jalan = new L.geoJson(json_jalan_arteri_lokal_1, { pane:'pane_Jalan', style:{color:'white', weight:1}, interactive:false });
+
+    map.createPane('pane_Pasar'); map.getPane('pane_Pasar').style.zIndex = 506;
+    var layer_Pasar = new L.geoJson(json_pasar_5, {
+      pane:'pane_Pasar',
+      pointToLayer: function(f, latlng){ return L.circleMarker(latlng, {radius:6, fillColor:'#e11d48', color:'white', weight:2, fillOpacity:1}); }
+    });
+
+    map.createPane('pane_Shortest'); map.getPane('pane_Shortest').style.zIndex = 504;
+    var layer_Shortest = new L.geoJson(json_SHORTESTPATH_3, { pane:'pane_Shortest', style:{color:'#10b981', weight:3}, interactive:false });
+
+    map.createPane('pane_Produksi'); map.getPane('pane_Produksi').style.zIndex = 403;
+    var layer_Produksi = new L.geoJson(json_produksi_0, { pane:'pane_Produksi', style:{color:'#fff', weight:1, fillColor:'#f59e0b', fillOpacity:0.8} });
+
+    map.createPane('pane_Batas'); map.getPane('pane_Batas').style.zIndex = 510;
+    var layer_Batas = new L.geoJson(json_BatasKecamatan_17, { pane:'pane_Batas', style:{color:'#facc15', fill:false, weight:2, dashArray:'5,5'}, interactive:false });
+    map.addLayer(layer_Batas); 
+
+    // 3. UI BUILDER
+    function lg(color, text){ return `<div class="legend-item"><div class="color-box" style="background:${color}"></div>${text}</div>`; }
+    const layerConfig = [
+      {
+        title: "Analisis Ketahanan Pangan",
+        items: [
+          { name: "Indeks Ketahanan (IKP)", desc: "Status prioritas kerentanan wilayah", layer: layer_IKP, checked: true, legend: `${lg('#d73027','Prioritas 1 (Sangat Rentan)')}${lg('#fc8d59','Prioritas 2')}${lg('#fee08b','Prioritas 3')}${lg('#d9ef8b','Prioritas 4')}${lg('#1a9850','Prioritas 5 (Sangat Tahan)')}` }
+        ]
+      },
+      {
+        title: "Infrastruktur & Akses",
+        items: [
+          { name: "Keterjangkauan Distribusi", desc: "Jarak tempuh ke pasar terdekat", layer: layer_Akses, checked: false, legend: `${lg('#1a9641','< 2.3 km (Sangat Dekat)')}${lg('#d7191c','> 6.2 km (Sangat Jauh)')}` },
+          { name: "Lokasi Pasar", layer: layer_Pasar, checked: false, legend: lg('#e11d48','Titik Pasar') },
+          { name: "Rute Tercepat", layer: layer_Shortest, checked: false, legend: lg('#10b981','Jalur Tercepat') },
+          { name: "Jaringan Jalan", layer: layer_Jalan, checked: false }
+        ]
+      },
+      { title: "Data Pertanian", items: [ { name: "Sebaran Produksi", desc: "Total Tonase Pangan", layer: layer_Produksi, checked: false, legend: lg('#f59e0b','Wilayah Produksi') } ] },
+      { title: "Administrasi", items: [ { name: "Batas Kecamatan", layer: layer_Batas, checked: true } ] }
+    ];
+
+    function renderSidebar() {
+      const container = document.getElementById('layerContainer');
+      container.innerHTML = ''; 
+      layerConfig.forEach((group, gIdx) => {
+        const label = document.createElement('div'); label.className = 'group-label'; label.innerText = group.title.toUpperCase(); container.appendChild(label);
+        group.items.forEach((item, iIdx) => {
+          const uID = `sw-${gIdx}-${iIdx}`;
+          const card = document.createElement('div'); card.className = 'layer-card'; if(item.checked) card.classList.add('active');
+          card.innerHTML = `<div class="card-head"><div class="layer-texts"><div class="l-title">${item.name}</div>${item.desc ? `<div class="l-desc">${item.desc}</div>` : ''}</div><label class="toggle-switch"><input type="checkbox" id="${uID}" ${item.checked?'checked':''}><span class="slider"></span></label></div>${item.legend ? `<div class="card-legend" id="legend-${uID}" style="display:${item.checked?'block':'none'}">${item.legend}</div>` : ''}`;
+          container.appendChild(card);
+          card.querySelector(`#${uID}`).addEventListener('change', function(){
+            if(this.checked){ map.addLayer(item.layer); item.layer.bringToFront(); card.classList.add('active'); if(item.legend) card.querySelector(`#legend-${uID}`).style.display='block'; }
+            else { map.removeLayer(item.layer); card.classList.remove('active'); if(item.legend) card.querySelector(`#legend-${uID}`).style.display='none'; }
+          });
+        });
+      });
+    }
+    renderSidebar();
+
+    // 4. UI LOGIC
+    document.getElementById('btnHide').addEventListener('click', () => document.body.classList.add('sb-hidden'));
+    document.getElementById('btnReopen').addEventListener('click', () => document.body.classList.remove('sb-hidden'));
+    
+    const btnBasemap = document.getElementById('btnBasemapToggle'); const basemapModal = document.getElementById('basemapModal');
+    btnBasemap.addEventListener('click', () => basemapModal.style.display = (basemapModal.style.display === 'block') ? 'none' : 'block');
+    
+    const btnAbout = document.getElementById('btnAboutToggle'); const aboutModal = document.getElementById('aboutModal');
+    btnAbout.addEventListener('click', () => aboutModal.style.display = 'flex');
+    document.getElementById('btnAboutClose').addEventListener('click', () => aboutModal.style.display = 'none');
+    
+    window.addEventListener('click', (e) => {
+        if (e.target == aboutModal) aboutModal.style.display = 'none';
+        if (!btnBasemap.contains(e.target) && !basemapModal.contains(e.target)) basemapModal.style.display = 'none';
+    });
+
+    // 5. INFO PANEL & ANALYSIS LOGIC
+    var infoPanel = document.getElementById('infoPanel'); var infoBody = document.getElementById('infoBody');
+    document.getElementById('infoClose').addEventListener('click', () => infoPanel.classList.remove('active'));
+
+    function safe(v){ return (v!=null && v!=undefined) ? v : "-"; }
+    function tc(str) { return str ? str.toLowerCase().replace(/\b\w/g, l=>l.toUpperCase()) : ""; }
+
+    // ---- CHART HELPERS (Produksi) ----
+    let __prodChart = null;
+
+    function num(x){
+      const n = Number(String(x ?? 0).replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function renderProduksiChart(canvasId, p){
+      const el = document.getElementById(canvasId);
+      if(!el || typeof Chart === "undefined") return;
+
+      // hancurkan chart sebelumnya biar nggak numpuk
+      if(__prodChart){
+        __prodChart.destroy();
+        __prodChart = null;
+      }
+
+      const labels = ["Padi", "Jagung", "Kedelai", "Kacang Tanah", "Kacang Hijau"];
+      const values = [
+        num(p.Padi),
+        num(p.Jagung),
+        num(p.Kedelai),
+        num(p["Kcng Tanah"]),
+        num(p["Kcng Hijau"])
+      ];
+
+      __prodChart = new Chart(el, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Produksi (Ton)",
+            data: values
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: (v) => Number(v).toLocaleString('id')
+              }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.label}: ${Math.round(ctx.parsed.y).toLocaleString('id')} Ton`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    
+    function showInfo(cat, title, props, fields, analysisText) {
+      let h = `<div style="font-size:16px; font-weight:800; color:var(--ugm-blue); line-height:1.2; margin-bottom:4px;">${title}</div>`;
+      h += `<div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; margin-bottom:12px;">DATA: ${cat}</div>`;
+      
+      if (cat === "IKP") {
+          let imgName = props.Kecamatan || props.WADMKC; 
+          if (imgName) {
+              h += `<img src="images/IKP.png" 
+                     style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:12px; border:1px solid #cbd5e1; display:block;" 
+                     onerror="this.style.display='none'" 
+                     alt="Foto ${imgName}"/>`;
+          }
+      }
+
+            // --- Tambahan: Diagram untuk PRODUKSI ---
+      if (cat === "Produksi") {
+          const chartId = "prodChartCanvas";
+          h += `
+            <div style="margin: 10px 0 12px 0;">
+              <div style="font-size:12px; color:#64748b; font-weight:700; margin-bottom:8px;">
+                Diagram Produksi Tanaman Pangan (Ton)
+              </div>
+              <div style="height:220px; border:1px solid #e2e8f0; border-radius:10px; padding:10px; background:#fff;">
+                <canvas id="${chartId}"></canvas>
+              </div>
+            </div>
+          `;
+      }
+
+
+      if (analysisText) {
+          h += `<div class="analysis-box"><strong>Analisis Wilayah:</strong><br>${analysisText}</div>`;
+      }
+
+      h += `<table class="infoTable"><tbody>`;
+      fields.forEach(f => {
+         let val = props[f.key]; if(f.fmt) val = f.fmt(val); else val = safe(val);
+         h += `<tr><td width="40%" style="font-weight:500; color:#64748b;">${f.lbl}</td><td style="font-weight:600; text-align:right;">${val}</td></tr>`;
+      });
+      h += `</tbody></table>`;
+      infoBody.innerHTML = h;
+      infoPanel.classList.add('active');
+            // render chart setelah HTML masuk DOM
+      if (cat === "Produksi") {
+        setTimeout(() => renderProduksiChart("prodChartCanvas", props), 0);
+      }
+
+    }
+
+    function generateAnalysis(cat, p) {
+        if (cat === "IKP") {
+            let pr = parseInt(p.Prioritas);
+            let status = "";
+            let color = "";
+
+            if(pr==1){ status="Sangat Rentan"; color="#d73027"; }
+            else if(pr==2){ status="Rentan"; color="#fc8d59"; }
+            else if(pr==3){ status="Cukup Tahan"; color="#f59e0b"; } 
+            else if(pr==4){ status="Tahan"; color="#65a30d"; } 
+            else { status="Sangat Tahan"; color="#1a9850"; }
+
+            let weakPoints = [];
+            if(parseFloat(p.Kemiskinan) > 15) weakPoints.push("tingkat kemiskinan yang tinggi");
+            if(parseFloat(p.Stunting) > 18) weakPoints.push("masalah stunting yang serius");
+            else if(parseFloat(p.Stunting) > 10) weakPoints.push("angka stunting yang moderat");
+            if(parseFloat(p.TnpAirBrsh) > 8) weakPoints.push("keterbatasan akses air bersih");
+            if(parseFloat(p.TnpListrik) > 2) weakPoints.push("kendala akses listrik");
+            if(parseFloat(p.RLS) < 7) weakPoints.push("rata-rata pendidikan yang masih rendah");
+            if(parseFloat(p.PngluarnPg) > 65) weakPoints.push("beban pengeluaran pangan yang berat");
+
+            let strongPoints = [];
+            if(parseFloat(p.Kemiskinan) < 10) strongPoints.push("tingkat ekonomi yang relatif baik");
+            if(parseFloat(p["AHH(tahun)"]) > 74) strongPoints.push("harapan hidup yang tinggi");
+            if(parseFloat(p.RasioNakes) > 0.6) strongPoints.push("ketersediaan tenaga kesehatan yang memadai");
+            if(parseFloat(p.NCPR) > 95) strongPoints.push("ketersediaan pangan yang sangat mencukupi");
+            if(parseFloat(p.TnpAirBrsh) < 1) strongPoints.push("akses air bersih yang optimal");
+
+            let text = `Secara umum, wilayah ini masuk dalam kategori <strong style="color:${color}">Prioritas ${pr} (${status})</strong>. `;
+            
+            if (weakPoints.length > 0) {
+                let mainIssues = weakPoints.slice(0, 3).join(", serta ");
+                if (pr <= 3) {
+                    text += `Analisis data menunjukkan kerentanan utama wilayah ini bersumber dari ${mainIssues}. `;
+                } else {
+                    text += `Meskipun status ketahanan pangan baik, perlu perhatian pada aspek ${mainIssues} untuk mencegah penurunan status. `;
+                }
+            } else {
+                if (pr <= 3) text += `Kerentanan bersifat multidimensi tanpa satu faktor dominan yang ekstrem, namun indikator secara umum berada di bawah rata-rata. `;
+            }
+
+            if (strongPoints.length > 0) {
+                let mainStrengths = strongPoints.slice(0, 2).join(" dan "); 
+                if (pr <= 3) {
+                    text += `Di sisi lain, terdapat potensi ketahanan dari aspek ${mainStrengths} yang bisa dimaksimalkan.`;
+                } else {
+                    text += `Kondisi ini didukung kuat oleh ${mainStrengths} yang menjadi pilar stabilitas pangan di kecamatan ini.`;
+                }
+            }
+            return text;
+        } 
+        else if (cat === "Produksi") {
+            let crops = [
+                {n:'Jagung', v: parseFloat(p.Jagung)||0},
+                {n:'Padi', v: parseFloat(p.Padi)||0},
+                {n:'Kedelai', v: parseFloat(p.Kedelai)||0},
+                {n:'Kacang Tanah', v: parseFloat(p['Kcng Tanah'])||0}
+            ];
+            crops.sort((a,b) => b.v - a.v);
+            let topCrop = crops[0];
+            let total = parseFloat(p.Total) || 0;
+            return `Kecamatan ini merupakan sentra produksi pangan dengan komoditas unggulan <strong>${topCrop.n}</strong> (produksi mencapai ${topCrop.v.toLocaleString('id')} Ton). Total kontribusi pangan wilayah ini adalah ${total.toLocaleString('id')} Ton.`;
+        }
+        else if (cat === "Akses") {
+            let dist = p['jarak_m_mi'];
+            let access = dist < 2500 ? "Sangat Mudah" : dist < 4500 ? "Sedang" : "Sulit";
+            return `Analisis spasial menunjukkan aksesibilitas pangan di titik ini tergolong <strong>${access}</strong> dengan estimasi jarak tempuh ke pasar terdekat sekitar ${Math.round(dist)} meter.`;
+        }
+        else if (cat === "Infrastruktur") {
+            return `Lokasi ini merupakan titik distribusi vital (Pasar) yang menyangga kebutuhan pangan masyarakat sekitar.`;
+        }
+        return "";
+    }
+
+    function regClick(lyr, cat, getTitle, fields) {
+      if(!lyr) return;
+      lyr.eachLayer(l => {
+        l.on('click', e => {
+          L.DomEvent.stopPropagation(e);
+          let p = e.target.feature.properties;
+          let analysis = generateAnalysis(cat, p);
+          showInfo(cat, getTitle(p), p, fields, analysis);
+        });
+      });
+    }
+
+    regClick(layer_IKP, "IKP", p => "Kec. " + safe(p.Kecamatan||p.WADMKC), [
+        {lbl: "Prioritas", key: "Prioritas", fmt: v=>`<span style='color:${v<=2?'#dc2626':'#16a34a'}'>Prioritas ${v}</span>`},
+        {lbl: "Kemiskinan", key: "Kemiskinan", fmt: v=>v+"%"},
+        {lbl: "Stunting", key: "Stunting", fmt: v=>v+"%"},
+        {lbl: "Pengeluaran Pangan >65%", key: "PngluarnPg", fmt: v=>v+"%"},
+        {lbl: "Tanpa Listrik", key: "TnpListrik", fmt: v=>v+"%"},
+        {lbl: "Tanpa Air Bersih", key:"TnpAirBrsh", fmt: v=>v+"%"},
+        {lbl: "Lama Sekolah (Tahun)", key:"RLS", fmt: v=>v+"%"},
+        {lbl: "Angka Harapan Hidup", key: "AHH(tahun)", fmt: v=>v+" Tahun"},
+        {lbl: "Konsumsi Normatif per Kapita", key: "NCPR", fmt: v=>v+"%"},
+        {lbl: "Rasio Nakes per Penduduk", key: "RasioNakes", fmt: v=>v+"%"}
+    ]);
+
+    regClick(layer_Produksi, "Produksi", p => "Kec. " + tc(p.WADMKC||p.Kecamatan||p.NAMOBJ), [
+        {lbl: "Total Panen", key: "Total", fmt: v=>`<span style="font-weight:bold; color:#d97706;">${parseInt(v).toLocaleString('id')} Ton</span>`},
+        {lbl: "Padi", key:"Padi", fmt: v=>parseInt(v).toLocaleString('id')+" Ton"},
+        {lbl: "Jagung", key:"Jagung", fmt: v=>parseInt(v).toLocaleString('id')+" Ton"},
+        {lbl: "Kedelai", key:"Kedelai", fmt: v=>parseInt(v).toLocaleString('id')+" Ton"},
+        {lbl: "Kacang Tanah", key:"Kcng Tanah", fmt: v=>parseInt(v).toLocaleString('id')+" Ton"},
+        {lbl: "Kacang Hijau", key:"Kcng Hijau", fmt: v=>parseInt(v).toLocaleString('id')+" Ton"}
+    ]);
+
+    regClick(layer_Akses, "Akses", p => "Kec. " + tc(p.WADMKC || p.Kecamatan || p.NAMOBJ), [
+        {lbl: "Jarak ke Pasar", key: "jarak_m_mi", fmt: v=>`<span style="font-size:14px; color:#0f172a;">${Math.round(v).toLocaleString('id')} Meter</span>`}
+    ]);
+
+    regClick(layer_Pasar, "Infrastruktur", p => tc(p.pasar||p.Nama||"Pasar"), [
+        {lbl:"Nama Lokasi", key:"pasar"},
+        {lbl:"Tipe", key:"remark", fmt: v=>v?v:"Pasar Tradisional"} 
+    ]);
+
+  </script>
+
+  <script>
+      // ============================================================
+      // LOGIKA OTOMATISASI LAYER DARI GALERI (URL PARAMETER)
+      // ============================================================
+
+      function activateViewFromUrl() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeView = urlParams.get('view');
+
+          if (!activeView) return; // Jika dibuka biasa tanpa link galeri, stop.
+
+          // 1. Matikan SEMUA Layer Terlebih Dahulu (Reset State)
+          // Kita gunakan list semua layer yang ada
+          const allLayers = [
+              layer_IKP, 
+              layer_Akses, 
+              layer_Pasar, 
+              layer_Shortest, 
+              layer_Jalan, 
+              layer_Produksi
+          ];
+
+          allLayers.forEach(layer => {
+              if (map.hasLayer(layer)) map.removeLayer(layer);
+          });
+
+          // 2. Definisi Kombinasi Layer berdasarkan View
+          if (activeView === 'ikp') {
+              map.addLayer(layer_IKP);
+              // IKP biasanya layer paling bawah (base analysis)
+          } 
+          else if (activeView === 'infrastruktur') {
+              // Kombinasi 4 Layer sekaligus
+              map.addLayer(layer_Akses);
+              map.addLayer(layer_Jalan);
+              map.addLayer(layer_Shortest);
+              map.addLayer(layer_Pasar);
+              
+              // Atur urutan tumpukan agar rapi
+              layer_Akses.bringToBack(); // Choropleth di bawah
+              layer_Jalan.bringToFront();
+              layer_Shortest.bringToFront();
+              layer_Pasar.bringToFront(); // Titik pasar paling atas
+          } 
+          else if (activeView === 'produksi') {
+              map.addLayer(layer_Produksi);
+          }
+
+          // 3. Sinkronisasi Checkbox di Sidebar (Agar UI sesuai dengan Peta)
+          // Kita beri delay sedikit agar sidebar selesai di-render dulu
+          setTimeout(syncSidebarUI, 500);
+      }
+
+      // Fungsi untuk mencentang/uncentang checkbox sidebar sesuai kondisi peta
+      function syncSidebarUI() {
+          // Mapping antara variabel layer dengan nama di sidebar (harus manual check)
+          // List ini harus sesuai dengan layerConfig di script utama Anda
+          const mapping = [
+              { layer: layer_IKP, id: 'sw-0-0' },       // Group 0, Item 0
+              { layer: layer_Akses, id: 'sw-1-0' },     // Group 1, Item 0
+              { layer: layer_Pasar, id: 'sw-1-1' },     // Group 1, Item 1
+              { layer: layer_Shortest, id: 'sw-1-2' },  // Group 1, Item 2
+              { layer: layer_Jalan, id: 'sw-1-3' },     // Group 1, Item 3
+              { layer: layer_Produksi, id: 'sw-2-0' }   // Group 2, Item 0
+          ];
+
+          mapping.forEach(item => {
+              const checkbox = document.getElementById(item.id);
+              const card = checkbox ? checkbox.closest('.layer-card') : null;
+              const legend = card ? card.querySelector('.card-legend') : null;
+
+              if (checkbox && card) {
+                  if (map.hasLayer(item.layer)) {
+                      checkbox.checked = true;
+                      card.classList.add('active');
+                      if(legend) legend.style.display = 'block';
+                  } else {
+                      checkbox.checked = false;
+                      card.classList.remove('active');
+                      if(legend) legend.style.display = 'none';
+                  }
+              }
+          });
+      }
+
+      // JALANKAN FUNGSI
+      activateViewFromUrl();
+
+  </script>
+</body>
+</html>
